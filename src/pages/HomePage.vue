@@ -1,6 +1,6 @@
 <template>
   <main class="home-page">
-    <section class="hero">
+    <section id="top" class="hero">
       <video
         class="hero__video"
         autoplay
@@ -13,7 +13,6 @@
       </video>
 
       <div class="hero__overlay"></div>
-     
 
       <div class="hero__content">
         <h1 class="hero__title">
@@ -67,7 +66,7 @@
       </div>
     </section>
 
-    <section class="home-section home-section--dark">
+    <section id="stats" class="home-section home-section--dark">
       <div class="home-container">
         <div class="section-content">
           <p class="section-label">Ключевые показатели</p>
@@ -106,7 +105,7 @@
       </div>
     </section>
 
-    <section class="home-section directions-section">
+    <section id="directions" class="home-section directions-section">
       <div class="home-container">
         <div class="section-content">
           <p class="section-label">Направления деятельности</p>
@@ -167,9 +166,8 @@
       </div>
     </section>
 
-    <section class="home-section audience-section">
+    <section id="partners" class="home-section audience-section">
       <div class="home-container">
-        <div class="hero__stars"></div>
         <div class="section-content">
           <p class="section-label">Партнёры и возможности</p>
 

@@ -44,13 +44,12 @@
 
           <p>info@oblivione-space.ru</p>
           <p>+7 (900) 000-00-00</p>
-          <p>Учебный проект</p>
         </div>
       </div>
 
       <div class="site-footer__bottom">
         <p>© 2026 Oblivione Space</p>
-        <p>Сайт компании в сфере частного ракетостроения</p>
+        <p>Учебный проект</p>
       </div>
     </div>
   </footer>
@@ -58,9 +57,9 @@
 
 <style scoped>
 .site-footer {
-  padding: 78px 0 28px;
+  padding: 42px 0 22px;
   background:
-    radial-gradient(circle at 20% 0%, rgba(77, 163, 255, 0.12), transparent 32%),
+    radial-gradient(circle at 20% 0%, rgba(77, 163, 255, 0.1), transparent 28%),
     #030611;
   border-top: 1px solid rgba(132, 179, 255, 0.16);
   color: #b8c7df;
@@ -73,29 +72,29 @@
 
 .site-footer__main {
   display: grid;
-  grid-template-columns: 1.4fr repeat(3, 1fr);
-  gap: 42px;
+  grid-template-columns: 1.35fr repeat(3, 1fr);
+  gap: 28px;
 }
 
 .site-footer__logo {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 14px;
   color: #ffffff;
   text-decoration: none;
 }
 
 .site-footer__logo-image {
   width: auto;
-  height: 52px;
+  height: 38px;
   display: block;
   object-fit: contain;
 }
 
 .site-footer__logo-text {
   font-family: "Montserrat", Arial, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -103,31 +102,31 @@
 }
 
 .site-footer__brand p {
-  max-width: 420px;
+  max-width: 380px;
   margin: 0;
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .site-footer__column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .site-footer__column h3 {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   color: #ffffff;
   font-family: "Montserrat", Arial, sans-serif;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .site-footer__column a,
 .site-footer__column p {
   margin: 0;
   color: #b8c7df;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.45;
   text-decoration: none;
 }
 
@@ -140,13 +139,13 @@
 }
 
 .site-footer__bottom {
-  margin-top: 54px;
-  padding-top: 24px;
+  margin-top: 28px;
+  padding-top: 16px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
   border-top: 1px solid rgba(132, 179, 255, 0.16);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .site-footer__bottom p {
@@ -161,7 +160,7 @@
 
 @media (max-width: 560px) {
   .site-footer {
-    padding-top: 58px;
+    padding-top: 34px;
   }
 
   .site-footer__main {
@@ -169,11 +168,11 @@
   }
 
   .site-footer__logo-image {
-    height: 46px;
+    height: 34px;
   }
 
   .site-footer__logo-text {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .site-footer__bottom {
