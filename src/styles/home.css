@@ -30,8 +30,7 @@
 }
 
 .hero__video,
-.hero__overlay,
-.hero__stars {
+.hero__overlay {
   position: absolute;
   inset: 0;
 }
@@ -50,17 +49,6 @@
     linear-gradient(180deg, rgba(5, 8, 20, 0.58), rgba(5, 8, 20, 0.82));
 }
 
-.hero__stars {
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0.8;
-  background-image:
-    radial-gradient(circle, rgba(0, 210, 255, 0.9) 1px, transparent 2px),
-    radial-gradient(circle, rgba(0, 210, 255, 0.55) 1px, transparent 2px);
-  background-size: 190px 190px, 260px 260px;
-  background-position: 20px 40px, 90px 120px;
-  animation: starsMove 18s linear infinite;
-}
 
 .hero__content {
   position: relative;

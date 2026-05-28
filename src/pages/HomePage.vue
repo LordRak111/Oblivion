@@ -13,7 +13,7 @@
       </video>
 
       <div class="hero__overlay"></div>
-      <div class="hero__stars"></div>
+     
 
       <div class="hero__content">
         <h1 class="hero__title">
@@ -169,6 +169,7 @@
 
     <section class="home-section audience-section">
       <div class="home-container">
+        <div class="hero__stars"></div>
         <div class="section-content">
           <p class="section-label">Партнёры и возможности</p>
 
