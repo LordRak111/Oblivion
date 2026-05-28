@@ -1,9 +1,11 @@
-<script setup>
-
-</script>
-
 <template>
-
+  <ProductsPage />
 </template>
 
-<style scoped></style>
+<script setup>
+import ProductsPage from './components/ProductPage.vue'
+</script>
+
+<style>
+
+</style>
