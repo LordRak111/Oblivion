@@ -123,9 +123,32 @@
   background: var(--bg);
 }
 
-.home-section--dark,
+.home-section--dark {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(9, 16, 32, 0.96), rgba(9, 16, 32, 0.82)),
+    url('/images/bg-stats.jpg') center / cover no-repeat;
+}
+
 .audience-section {
   background: var(--bg-soft);
+}
+
+.home-section--dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(77, 163, 255, 0.14), transparent 30%),
+    radial-gradient(circle at 85% 70%, rgba(255, 159, 67, 0.08), transparent 28%);
+}
+
+.home-section--dark .home-container {
+  position: relative;
+  z-index: 2;
 }
 
 .home-container {
@@ -186,7 +209,7 @@
 .direction-card,
 .audience-card {
   border: 1px solid var(--border);
-  background: var(--card);
+  background-color: var(--card);
   box-shadow: var(--shadow);
 }
 
@@ -258,14 +281,16 @@
   gap: 18px;
 }
 
-/* Cards */
+/* Stat and audience cards */
 
 .stat-card,
-.direction-card,
 .audience-card {
   padding: 32px;
   border-radius: 28px;
-  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease;
 }
 
 .stat-card {
@@ -276,14 +301,7 @@
 .stat-card:hover {
   transform: translateY(-6px);
   border-color: rgba(77, 163, 255, 0.55);
-  background: rgba(77, 163, 255, 0.07);
-}
-
-.direction-card:hover,
-.audience-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(255, 159, 67, 0.52);
-  background: rgba(255, 159, 67, 0.065);
+  background-color: rgba(77, 163, 255, 0.07);
 }
 
 .stat-card__number {
@@ -295,15 +313,81 @@
   font-weight: 800;
 }
 
-.direction-card__icon {
-  width: 58px;
-  height: 58px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 24px;
-  border-radius: 20px;
-  background: linear-gradient(145deg, rgba(77, 163, 255, 0.2), rgba(255, 159, 67, 0.12));
-  font-size: 28px;
+.audience-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 159, 67, 0.52);
+  background-color: rgba(255, 159, 67, 0.065);
+}
+
+/* Direction cards */
+
+.direction-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  align-items: flex-end;
+  padding: 34px;
+  border-radius: 28px;
+  background-color: #071022;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.direction-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 159, 67, 0.52);
+}
+
+.direction-card--rocket {
+  background-image: url('/images/direction-rocket.jpg');
+}
+
+.direction-card--satellite {
+  background-image: url('/images/direction-satellite.jpg');
+}
+
+.direction-card--engineering {
+  background-image: url('/images/direction-engineering.jpg');
+}
+
+.direction-card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(5, 8, 20, 0.12), rgba(5, 8, 20, 0.94)),
+    radial-gradient(circle at top left, rgba(77, 163, 255, 0.18), transparent 42%);
+}
+
+.direction-card__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 92%;
+  min-height: 142px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.direction-card__title {
+  min-height: 62px;
+  margin: 0 0 14px;
+  font-size: 26px;
+  line-height: 1.15;
+}
+
+.direction-card__text {
+  min-height: 58px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 16px;
+  line-height: 1.55;
 }
 
 /* Animation */
@@ -360,13 +444,27 @@
     grid-template-columns: 1fr;
   }
 
+  .direction-card {
+    min-height: 280px;
+    padding: 24px;
+  }
+
+  .direction-card__content,
+  .direction-card__title,
+  .direction-card__text {
+    min-height: auto;
+  }
+
+  .direction-card__title {
+    font-size: 24px;
+  }
+
   .mission-card__image {
     height: 260px;
   }
 
   .mission-card__content,
   .stat-card,
-  .direction-card,
   .audience-card {
     padding: 24px;
   }

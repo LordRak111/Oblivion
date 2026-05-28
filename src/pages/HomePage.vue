@@ -122,40 +122,46 @@
         </div>
 
         <div class="directions-grid">
-          <article class="direction-card">
-            <div class="direction-card__icon">🚀</div>
+          <article class="direction-card direction-card--rocket">
+            <div class="direction-card__overlay"></div>
 
-            <h3 class="direction-card__title">
-              Ракетные носители
-            </h3>
+            <div class="direction-card__content">
+              <h3 class="direction-card__title">
+                Ракетные<br> носители
+              </h3>
 
-            <p class="direction-card__text">
-              Концепты ракетных систем для малых коммерческих запусков.
-            </p>
+              <p class="direction-card__text">
+                Концепты ракетных систем для малых коммерческих запусков.
+              </p>
+            </div>
           </article>
 
-          <article class="direction-card">
-            <div class="direction-card__icon">🛰</div>
+          <article class="direction-card direction-card--satellite">
+            <div class="direction-card__overlay"></div>
 
-            <h3 class="direction-card__title">
-              Спутниковые решения
-            </h3>
+            <div class="direction-card__content">
+              <h3 class="direction-card__title">
+                Спутниковые решения
+              </h3>
 
-            <p class="direction-card__text">
-              Технологии для вывода и сопровождения малых космических аппаратов.
-            </p>
+              <p class="direction-card__text">
+                Технологии для вывода и сопровождения малых космических аппаратов.
+              </p>
+            </div>
           </article>
 
-          <article class="direction-card">
-            <div class="direction-card__icon">⚙️</div>
+          <article class="direction-card direction-card--engineering">
+            <div class="direction-card__overlay"></div>
 
-            <h3 class="direction-card__title">
-              Инженерные исследования
-            </h3>
+            <div class="direction-card__content">
+              <h3 class="direction-card__title">
+                Инженерные исследования
+              </h3>
 
-            <p class="direction-card__text">
-              Проектирование, анализ и испытания компонентов для космической отрасли.
-            </p>
+              <p class="direction-card__text">
+                Проектирование, анализ и испытания компонентов для космической отрасли.
+              </p>
+            </div>
           </article>
         </div>
       </div>
