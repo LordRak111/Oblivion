@@ -136,7 +136,7 @@ const closeMenu = () => {
 
         <div class="site-header__item">
           <div class="site-header__row">
-            <a href="#" class="site-header__link" @click.prevent="closeMenu">
+            <a href="#projects" class="site-header__link" @click="closeMenu">
               Проекты
             </a>
 
