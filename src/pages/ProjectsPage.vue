@@ -101,7 +101,7 @@ const projects = [
     statusText: 'Завершен',
     date: 'Янв 2023 — Июн 2023',
     customer: 'РосКосмос',
-    image: '/images/project-1.jpg',
+    image: '/images/Svyz-2023.png',
     results: [
       'Успешный вывод 12 спутников на орбиту',
       'Точность вывода 99.8%',
@@ -115,7 +115,7 @@ const projects = [
     statusText: 'В работе',
     date: 'Авг 2024 — Настоящее время',
     customer: 'ИКИ РАН',
-    image: '/images/project-2.jpg',
+    image: '/images/Moon-Resurs.png',
     results: [
       'Ракета успешно запущена',
       'Коррекция траектории выполнена',
@@ -129,7 +129,7 @@ const projects = [
     statusText: 'Завершен',
     date: 'Мар 2024 — Май 2024',
     customer: 'SpaceCom Inc.',
-    image: '/images/project-3.jpg',
+    image: '/images/SpaceCom.png',
     results: [
       'Вывод коммерческого спутника на ГСО',
       'Клиент подтвердил работоспособность',
@@ -143,7 +143,7 @@ const projects = [
     statusText: 'В работе',
     date: 'Сент 2025 — Настоящее время',
     customer: 'РосКосмос',
-    image: '/images/project-4.jpg',
+    image: '/images/Vostok-2.png',
     results: [
       'Запущен первый модуль станции',
       'Стыковка прошла успешно',
@@ -157,7 +157,7 @@ const projects = [
     statusText: 'Завершен',
     date: 'Фев 2023 — Окт 2023',
     customer: 'ESA',
-    image: '/images/project-5.jpg',
+    image: '/images/Mars-Meteo.png',
     results: [
       'Успешный запуск и выход на траекторию',
       'Зонд достиг орбиты Марса',
@@ -171,7 +171,7 @@ const projects = [
     statusText: 'Завершен',
     date: 'Июл 2022 — Дек 2022',
     customer: 'ГЛОНАСС',
-    image: '/images/project-6.jpg',
+    image: '/images/Global-GPS.png',
     results: [
       'Запущено 8 навигационных спутников',
       'Точность позиционирования улучшена',
