@@ -1,9 +1,15 @@
 <template>
-  <ProductsPage />
+    <div class="app">
+    <SiteHeader />
+    <ProductsPage />
+    <SiteFooter />
+  </div>
 </template>
 
 <script setup>
-import ProductsPage from './components/ProductPage.vue'
+import SiteHeader from './components/SiteHeader.vue';
+import ProductsPage from './components/ProductPage.vue';
+import SiteFooter from './components/SiteFooter.vue';
 </script>
 
 <style>
