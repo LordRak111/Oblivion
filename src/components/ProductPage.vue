@@ -177,16 +177,16 @@ import * as THREE from 'three'
 // ===================== КАТАЛОГ ТОВАРОВ (без изменений) =====================
 const generateItems = () => {
   const rockets = [
-    { name: 'Орбита-X Heavy', height:'62m', payload:'22t', thrust:'2800kN', img:'https://picsum.photos/id/4/300/200', fullDesc:'Сверхтяжёлый носитель для Луны и Марса.', modelType:'rocket' },
-    { name: 'Старт-1', height:'28m', payload:'2.5t', thrust:'450kN', img:'https://picsum.photos/id/29/300/200', fullDesc:'Лёгкий носитель для малых спутников.', modelType:'rocket' },
-    { name: 'Титан-3', height:'74m', payload:'36t', thrust:'4200kN', img:'https://picsum.photos/id/96/300/200', fullDesc:'Флагман для марсианских экспедиций.', modelType:'rocket' },
-    { name: 'Союз-2', height:'46m', payload:'7.5t', thrust:'950kN', img:'https://picsum.photos/id/22/300/200', fullDesc:'Классическая надёжность.', modelType:'rocket' },
-    { name: 'Ангара-А5', height:'55m', payload:'24t', thrust:'2600kN', img:'https://picsum.photos/id/31/300/200', fullDesc:'Тяжёлый носитель нового поколения.', modelType:'rocket' },
-    { name: 'Электрон', height:'17m', payload:'0.3t', thrust:'50kN', img:'https://picsum.photos/id/39/300/200', fullDesc:'Сверхлёгкий для малых спутников.', modelType:'rocket' },
-    { name: 'Нейтрон-2', height:'40m', payload:'13t', thrust:'1450kN', img:'https://picsum.photos/id/44/300/200', fullDesc:'Средний класс с возвращаемой ступенью.', modelType:'rocket' },
-    { name: 'Сатурн-9', height:'98m', payload:'55t', thrust:'5900kN', img:'https://picsum.photos/id/58/300/200', fullDesc:'Ультратяжёлый для пилотируемых экспедиций.', modelType:'rocket' },
-    { name: 'Вега-Лайт', height:'30m', payload:'1.8t', thrust:'300kN', img:'https://picsum.photos/id/15/300/200', fullDesc:'Экономичный запуск малых аппаратов.', modelType:'rocket' },
-    { name: 'Falcon-9R', height:'70m', payload:'22.8t', thrust:'7600kN', img:'https://picsum.photos/id/18/300/200', fullDesc:'Многоразовый носитель среднего класса.', modelType:'rocket' }
+    { name: 'Орбита-X Heavy', height:'62m', payload:'22t', thrust:'2800kN', img:'public/images/ракета1.PNG', fullDesc:'Сверхтяжёлый носитель для Луны и Марса.', modelType:'rocket' },
+    { name: 'Старт-1', height:'28m', payload:'2.5t', thrust:'450kN', img: 'public/images/ракета 2.PNG', fullDesc:'Лёгкий носитель для малых спутников.', modelType:'rocket' },
+    { name: 'Титан-3', height:'74m', payload:'36t', thrust:'4200kN', img:'public/images/ракета3.PNG', fullDesc:'Флагман для марсианских экспедиций.', modelType:'rocket' },
+    { name: 'Союз-2', height:'46m', payload:'7.5t', thrust:'950kN', img:'public/images/ракета4.PNG', fullDesc:'Классическая надёжность.', modelType:'rocket' },
+    { name: 'Ангара-А5', height:'55m', payload:'24t', thrust:'2600kN', img:'public/images/ракета5.PNG', fullDesc:'Тяжёлый носитель нового поколения.', modelType:'rocket' },
+    { name: 'Электрон', height:'17m', payload:'0.3t', thrust:'50kN', img:'public/images/рак6.PNG', fullDesc:'Сверхлёгкий для малых спутников.', modelType:'rocket' },
+    { name: 'Нейтрон-2', height:'40m', payload:'13t', thrust:'1450kN', img:'public/images/рак7.PNG', fullDesc:'Средний класс с возвращаемой ступенью.', modelType:'rocket' },
+    { name: 'Сатурн-9', height:'98m', payload:'55t', thrust:'5900kN', img:'public/images/рак8.PNG', fullDesc:'Ультратяжёлый для пилотируемых экспедиций.', modelType:'rocket' },
+    { name: 'Вега-Лайт', height:'30m', payload:'1.8t', thrust:'300kN', img:'public/images/рак9.PNG', fullDesc:'Экономичный запуск малых аппаратов.', modelType:'rocket' },
+    { name: 'Falcon-9R', height:'70m', payload:'22.8t', thrust:'7600kN', img:'public/images/рак10.PNG', fullDesc:'Многоразовый носитель среднего класса.', modelType:'rocket' }
   ]
   const components = [
     { name: 'ЖРД R-220', mass:'320kg', thrust:'190kN', img:'https://picsum.photos/id/33/300/200', fullDesc:'Кислородно-водородный двигатель.', modelType:'engine' },
