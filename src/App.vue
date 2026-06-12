@@ -1,4 +1,4 @@
-feature/nikita/product
+
 <template>
     <div class="app">
     <SiteHeader />
