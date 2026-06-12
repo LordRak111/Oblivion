@@ -277,11 +277,140 @@ const rockets = ref([
   }
 ])
 
+<<<<<<< Updated upstream
 const technologies = ref([
   { name: 'Искусственный интеллект', icon: '🧠', description: 'Автономное управление полётом', progress: 95 },
   { name: '3D печать компонентов', icon: '🖨️', description: 'Ускорение производства на 70%', progress: 88 },
   { name: 'Квантовая связь', icon: '🔒', description: 'Защищённый канал передачи данных', progress: 76 },
   { name: 'Экологичное топливо', icon: '🌿', description: 'Снижение выбросов CO2', progress: 92 }
+=======
+// ---------------------- 3D ГЛОБУС ----------------------
+const globeContainer = ref(null)
+let sceneGlobe, cameraGlobe, rendererGlobe, earthMesh, markersGroup
+function addMarker(lat, lon, color) {
+  const radius = 1.01
+  const phi = (90 - lat) * Math.PI / 180
+  const theta = lon * Math.PI / 180
+  const x = radius * Math.sin(phi) * Math.cos(theta)
+  const y = radius * Math.cos(phi)
+  const z = radius * Math.sin(phi) * Math.sin(theta)
+  const geometry = new THREE.SphereGeometry(0.02, 16, 16)
+  const material = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.5 })
+  const marker = new THREE.Mesh(geometry, material)
+  marker.position.set(x, y, z)
+  markersGroup.add(marker)
+}
+function initGlobe() {
+  if (!globeContainer.value) return
+  const container = globeContainer.value
+  const width = container.clientWidth
+  const height = 400
+  sceneGlobe = new THREE.Scene()
+  cameraGlobe = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000)
+  cameraGlobe.position.set(0, 0, 3)
+  rendererGlobe = new THREE.WebGLRenderer({ antialias: true })
+  rendererGlobe.setSize(width, height)
+  container.appendChild(rendererGlobe.domElement)
+
+  const textureLoader = new THREE.TextureLoader()
+  const earthTexture = textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg')
+  const geometry = new THREE.SphereGeometry(1, 128, 128)
+  const material = new THREE.MeshStandardMaterial({ map: earthTexture })
+  earthMesh = new THREE.Mesh(geometry, material)
+  sceneGlobe.add(earthMesh)
+
+  markersGroup = new THREE.Group()
+  earthMesh.add(markersGroup)
+
+  addMarker(45.9, 63.3, 0xff3333)
+  addMarker(28.4, -80.5, 0xff3333)
+  addMarker(5.2, -52.7, 0xff3333)
+  addMarker(51.8, 128.3, 0xff3333)
+  addMarker(28.2, 102.0, 0xff3333)
+  addMarker(39.0, -76.5, 0xff3333)
+  addMarker(34.9, 136.6, 0xff3333)
+
+  const starGeometry = new THREE.BufferGeometry()
+  const starCount = 1500
+  const starPositions = new Float32Array(starCount * 3)
+  for (let i = 0; i < starCount; i++) {
+    starPositions[i*3] = (Math.random() - 0.5) * 2000
+    starPositions[i*3+1] = (Math.random() - 0.5) * 2000
+    starPositions[i*3+2] = (Math.random() - 0.5) * 2000 - 100
+  }
+  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3))
+  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff })
+  const stars = new THREE.Points(starGeometry, starMaterial)
+  sceneGlobe.add(stars)
+
+  const ambientLight = new THREE.AmbientLight(0x404040)
+  sceneGlobe.add(ambientLight)
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1)
+  dirLight.position.set(1, 2, 1)
+  sceneGlobe.add(dirLight)
+
+  let mouseX = 0, mouseY = 0, isDragging = false
+  container.addEventListener('mousedown', () => isDragging = true)
+  window.addEventListener('mouseup', () => isDragging = false)
+  window.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      mouseX += e.movementX * 0.005
+      mouseY += e.movementY * 0.005
+    }
+  })
+  function animateGlobe() {
+    earthMesh.rotation.y = mouseX
+    earthMesh.rotation.x = mouseY
+    rendererGlobe.render(sceneGlobe, cameraGlobe)
+    requestAnimationFrame(animateGlobe)
+  }
+  animateGlobe()
+}
+onMounted(() => { initGlobe() })
+
+// ---------------------- МОДАЛЬНОЕ ОКНО (без 3D) ----------------------
+const modalOpen = ref(false)
+const modalData = ref({})
+function closeModal() { modalOpen.value = false }
+function openModal(item) {
+  modalData.value = item
+  modalOpen.value = true
+}
+
+// Форма заявки
+const formVisible = ref(false)
+const formData = ref({ name:'', email:'', message:'' })
+function quickOrder(item) { formData.value.message = `Интересуюсь: ${item.name}`; formVisible.value = true }
+function openRequestForm() { formVisible.value = true }
+async function submitFinalForm() {
+  try {
+    const response = await fetch('http://localhost:3000/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData.value)
+    });
+
+    if (response.ok) {
+      alert('✅ Заявка успешно отправлена! Мы свяжемся с вами.');
+      formVisible.value = false;
+      formData.value = { name: '', email: '', message: '' };
+    } else {
+      const err = await response.json();
+      alert('❌ Ошибка: ' + (err.error || 'Не удалось отправить'));
+    }
+  } catch (error) {
+    console.error('Ошибка сети:', error);
+    alert('️ Нет связи с сервером. Убедитесь, что бэкенд запущен на порту 3000.');
+  }
+}
+
+// Карусель
+const popularLaunches = ref([
+  { id:1, mission:'Артемида-2', date:'Сентябрь 2026', status:'успех' },
+  { id:2, mission:'Марс-2026', date:'Июль 2026', status:'планируется' },
+  { id:3, mission:'Спектр-РГ', date:'Май 2026', status:'успех' },
+  { id:4, mission:'Луна-28', date:'Октябрь 2026', status:'планируется' }
+>>>>>>> Stashed changes
 ])
 
 const advantages = ref([
