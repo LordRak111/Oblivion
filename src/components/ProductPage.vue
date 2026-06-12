@@ -2,7 +2,7 @@
   <div class="universal-cosmos">
     <div class="main-wrap">
       <div class="content-area">
-        <!-- ХЕРО-СЕКЦИЯ со сдвигом вниз -->
+        <!-- ХЕРО-СЕКЦИЯ -->
         <section class="hero-super">
           <div class="hero-text">
             <h1>КОСМИЧЕСКИЙ <span class="glow">КАТАЛОГ</span></h1>
@@ -28,7 +28,9 @@
           </div>
           <div class="filter-group">
             <button v-for="cat in allCategories" :key="cat" class="filter-btn" :class="{ active: activeCat === cat }" @click="activeCat = cat">{{ cat }}</button>
-            <button class="filter-btn cart-btn" @click="cartOpen = !cartOpen"><i class="fas fa-shopping-cart"></i> ({{ cart.length }})</button>
+            <button class="filter-btn cart-btn" @click="cartOpen = !cartOpen">
+              <i class="fas fa-shopping-cart"></i> Корзина ({{ cart.length }})
+            </button>
           </div>
         </div>
 
@@ -50,7 +52,7 @@
           </div>
         </div>
 
-        <!-- Сетка товаров (расширенный каталог) -->
+        <!-- Сетка товаров -->
         <div class="infinite-grid">
           <div v-for="item in paginatedItems" :key="item.id" class="product-card-super">
             <div class="img-wrap">
@@ -77,14 +79,14 @@
           <button @click="nextPage" :disabled="currentPage === totalPages">Вперёд</button>
         </div>
 
-        <!-- 3D-ГЛОБУС С КРАСНЫМИ ТОЧКАМИ -->
+        <!-- 3D-ГЛОБУС -->
         <div class="globe-section">
           <h2><i class="fas fa-globe-americas"></i> Космодромы мира</h2>
           <div ref="globeContainer" class="globe-container"></div>
           <p class="globe-hint">Перетащите мышью для вращения</p>
         </div>
 
-        <!-- КАРУСЕЛЬ ПОПУЛЯРНЫХ ЗАПУСКОВ -->
+        <!-- КАРУСЕЛЬ ЗАПУСКОВ -->
         <div class="launch-carousel">
           <h2><i class="fas fa-rocket"></i> Популярные запуски</h2>
           <div class="carousel-wrapper">
@@ -102,18 +104,18 @@
           </div>
         </div>
 
-        <!-- ПРИЗЫВ К ДЕЙСТВИЮ -->
+        <!-- ПРИЗЫВ -->
         <div class="final-glory">
           <div class="glory-inner">
             <h2>Готовы запустить свой проект?</h2>
             <p>Станьте частью космической индустрии — оставьте заявку</p>
-            <button class="btn-giant" @click="openRequestForm">Связаться с инженером</button>
+            <button class="btn-giant" @click="openRequestForm">Связаться с нами</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ (без 3D) -->
+    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ -->
     <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
       <div class="modal-big">
         <div class="modal-header">
@@ -126,7 +128,7 @@
             <div v-for="(val, key) in modalData.specs" :key="key"><strong>{{ key }}:</strong> {{ val }}</div>
           </div>
           <p class="full-desc">{{ modalData.fullDesc }}</p>
-          <button class="btn-primary" @click="quickOrder(modalData)">Запросить коммерческое предложение</button>
+          <button class="btn-primary white-text" @click="quickOrder(modalData)">Запросить коммерческое предложение</button>
         </div>
       </div>
     </div>
@@ -143,7 +145,7 @@
             <input type="text" placeholder="Ваше имя" v-model="formData.name" required>
             <input type="email" placeholder="Email" v-model="formData.email" required>
             <textarea placeholder="Описание проекта" v-model="formData.message"></textarea>
-            <button type="submit" class="btn-primary">Отправить</button>
+            <button type="submit" class="btn-submit">Отправить</button>
           </form>
         </div>
       </div>
@@ -155,10 +157,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 
-// ===================== КАТАЛОГ ТОВАРОВ =====================
+// ---------------------- КАТАЛОГ ТОВАРОВ ----------------------
 const generateItems = () => {
   const rockets = [
     { name: 'Орбита-X Heavy', height:'62m', payload:'22t', thrust:'2800kN', img:'https://picsum.photos/id/4/300/200', fullDesc:'Сверхтяжёлый носитель для Луны и Марса.', modelType:'rocket' },
@@ -171,7 +173,6 @@ const generateItems = () => {
     { name: 'Сатурн-9', height:'98m', payload:'55t', thrust:'5900kN', img:'https://picsum.photos/id/58/300/200', fullDesc:'Ультратяжёлый для пилотируемых экспедиций.', modelType:'rocket' },
     { name: 'Вега-Лайт', height:'30m', payload:'1.8t', thrust:'300kN', img:'https://picsum.photos/id/15/300/200', fullDesc:'Экономичный запуск малых аппаратов.', modelType:'rocket' },
     { name: 'Falcon-9R', height:'70m', payload:'22.8t', thrust:'7600kN', img:'https://picsum.photos/id/18/300/200', fullDesc:'Многоразовый носитель среднего класса.', modelType:'rocket' },
-    // Новые ракеты
     { name: 'CAS Space – Kinetica 2', height:'53 м', payload:'6.5 т', thrust:'1100 кН', img:'/рак6.PNG', fullDesc:'Китайская многоразовая ракета среднего класса.', modelType:'rocket' },
     { name: 'Великий поход-9 (CZ-9)', height:'103 м', payload:'140 т', thrust:'6000+ кН', img:'/рак11.PNG', fullDesc:'Сверхтяжёлая ракета Китая для Луны.', modelType:'rocket' },
     { name: 'SpaceX Starship', height:'120 м', payload:'100 т', thrust:'76000 кН', img:'/ракета1.PNG', fullDesc:'Полностью многоразовая ракета SpaceX.', modelType:'rocket' }
@@ -236,7 +237,7 @@ function addToCart(item) { if (!cart.value.find(i => i.id === item.id)) cart.val
 function removeFromCart(id) { cart.value = cart.value.filter(i => i.id !== id) }
 function checkout() { alert('Заказ оформлен! С вами свяжется менеджер.') }
 
-// Таймер обратного отсчёта
+// Таймер
 const targetDate = new Date(2026, 5, 15, 12, 0, 0).getTime()
 const days = ref(0), hours = ref(0), minutes = ref(0), seconds = ref(0)
 let timerInterval
@@ -259,7 +260,7 @@ const bigStats = ref([
   { label: 'Успешных миссий', value: 142 }
 ])
 
-// ===================== 3D-ГЛОБУС (без изменений) =====================
+// ---------------------- 3D ГЛОБУС ----------------------
 const globeContainer = ref(null)
 let sceneGlobe, cameraGlobe, rendererGlobe, earthMesh, markersGroup
 function addMarker(lat, lon, color) {
@@ -343,7 +344,7 @@ function initGlobe() {
 }
 onMounted(() => { initGlobe() })
 
-// ===================== МОДАЛЬНОЕ ОКНО (БЕЗ 3D) =====================
+// ---------------------- МОДАЛЬНОЕ ОКНО (без 3D) ----------------------
 const modalOpen = ref(false)
 const modalData = ref({})
 function closeModal() { modalOpen.value = false }
@@ -380,7 +381,7 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 </script>
 
 <style scoped>
-/* Все стили остаются без изменений (те же, что были) */
+/* ---------- БАЗОВЫЕ СТИЛИ ---------- */
 * {
   margin: 0;
   padding: 0;
@@ -411,17 +412,20 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .countdown .timer { font-size: 2rem; font-weight: bold; background: #00000066; display: inline-block; padding: 6px 20px; border-radius: 60px; margin-top: 12px; }
 .hero-stats { display: flex; gap: 40px; }
 .stat .num { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg,#fff,#7aaaff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+/* Поиск */
 .toolbar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin: 30px 0; }
 .search-area { background: #0d1f32; border-radius: 60px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; flex:2; }
 .search-area input { background: none; border: none; color: white; width: 100%; font-size: 1rem; outline: none; }
 .filter-group { display: flex; gap: 12px; flex-wrap: wrap; }
 .filter-btn { background: transparent; border: 1px solid #2c577d; padding: 6px 20px; border-radius: 40px; color: white; cursor: pointer; }
 .filter-btn.active { background: #0066ff; border-color: #0066ff; }
+/* Корзина */
 .cart-panel { background: rgba(10,20,40,0.95); backdrop-filter: blur(12px); border-radius: 32px; padding: 20px; margin-bottom: 30px; border: 1px solid #2c557a; }
 .cart-header { display: flex; justify-content: space-between; border-bottom: 1px solid #335a80; padding-bottom: 12px; }
 .cart-items { max-height: 200px; overflow-y: auto; margin: 15px 0; }
 .cart-item { display: flex; justify-content: space-between; padding: 5px 0; }
 .empty-cart { text-align: center; padding: 20px; color: #8090b0; }
+/* Сетка товаров */
 .infinite-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; }
 .product-card-super { background: rgba(8,20,36,0.7); backdrop-filter: blur(8px); border-radius: 28px; overflow: hidden; transition: 0.2s; border: 1px solid #2d5478; }
 .product-card-super:hover { transform: translateY(-4px); border-color: #4cc9ff; }
@@ -436,8 +440,10 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .pagination { display: flex; justify-content: center; gap: 20px; margin: 40px 0; }
 .pagination button { background: #1f3f60; border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; }
 .pagination button:disabled { opacity: 0.5; cursor: default; }
+/* Глобус */
 .globe-section { background: #030c18; border-radius: 48px; padding: 30px; margin: 40px 0; text-align: center; }
 .globe-container { width: 100%; height: 400px; background: #021020; border-radius: 28px; cursor: grab; }
+/* Карусель */
 .launch-carousel {
   background: #0a1428;
   border-radius: 48px;
@@ -477,9 +483,11 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .carousel-controls button:hover {
   background: #0066ff;
 }
+/* Призыв */
 .final-glory { margin: 60px 0 20px; }
 .glory-inner { background: linear-gradient(115deg, #10233e, #020b16); border-radius: 64px; padding: 50px 30px; text-align: center; border: 1px solid #2f7db0; }
 .btn-giant { background: linear-gradient(135deg,#0066ff,#00ccff); border: none; padding: 16px 48px; border-radius: 60px; font-size: 1.2rem; font-weight: bold; margin-top: 20px; cursor: pointer; }
+/* Модальные окна */
 .modal-overlay { position: fixed; top:0;left:0; width:100%;height:100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
 .modal-big { background: #0c1a2c; width: 700px; max-width: 90%; border-radius: 32px; max-height: 85vh; overflow-y: auto; }
 .modal-header { display: flex; justify-content: space-between; padding: 20px; border-bottom: 1px solid #2e5d88; }
@@ -488,8 +496,29 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .modal-img { width: 100%; border-radius: 24px; margin-bottom: 20px; }
 .detail-specs { background: #07131f; padding: 15px; border-radius: 24px; margin: 15px 0; }
 .full-desc { margin: 15px 0; line-height: 1.5; }
+/* Форма заявки */
 form input, form textarea { width: 100%; margin: 8px 0; padding: 12px; background: #0f1f30; border: 1px solid #2a5580; border-radius: 40px; color: white; }
-form button { margin-top: 16px; }
+.btn-submit {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: #0f1f30;
+  border: 1px solid #2a5580;
+  border-radius: 40px;
+  color: #b0c0e0;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-submit:hover {
+  background: #1a2f48;
+}
+/* Кнопка в модалке деталей (белый текст) */
+.white-text {
+  background: linear-gradient(95deg,#0066ff,#00aaff) !important;
+  color: white !important;
+  border: none;
+}
 .toast { position: fixed; bottom: 100px; right: 30px; background: #000000cc; color: white; padding: 12px 24px; border-radius: 40px; z-index: 2100; backdrop-filter: blur(8px); }
 @media (max-width: 1000px) {
   .hero-super { flex-direction: column; text-align: center; margin-top: 120px; }
