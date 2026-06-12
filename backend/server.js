@@ -45,6 +45,8 @@ app.use('/api/vacancies', require('./routes/vacancies'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/search', require('./routes/search'));
 
+app.use('/api/products', require('./routes/products'));
+
 // обработка ошибок
 app.use((err, req, res, next) => {
   console.error(`[ERROR] ${err.message}`);
