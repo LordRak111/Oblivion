@@ -5,26 +5,31 @@ const path = require('path');
 
 const DATA_FILE = path.join(__dirname, '..', 'data', 'projects.json');
 
-// GET /api/projects?status=current
+// GET /api/projects
 router.get('/', async (req, res) => {
   try {
     const rawData = await fs.readFile(DATA_FILE, 'utf-8');
-    let projects = JSON.parse(rawData);
+    const projects = JSON.parse(rawData);
 
-    // Фильтрация
+    // Опциональная фильтрация (если надо)
     const { status } = req.query;
-    if (status) {
-      projects = projects.filter(p => p.status === status);
-    }
+    const filtered = status && status !== 'all'
+      ? projects.filter(p => p.status === status)
+      : projects;
 
     res.json({
       success: true,
-      count: projects.length,
+      count: filtered.length,
+      total: projects.length,
       filter: status || 'all',
-      data: projects
+      items: filtered
     });
   } catch (err) {
-    res.status(500).json({ error: 'Ошибка чтения проектов' });
+    console.error(err);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Ошибка чтения проектов' 
+    });
   }
 });
 
