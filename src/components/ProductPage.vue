@@ -358,7 +358,27 @@ const formVisible = ref(false)
 const formData = ref({ name:'', email:'', message:'' })
 function quickOrder(item) { formData.value.message = `Интересуюсь: ${item.name}`; formVisible.value = true }
 function openRequestForm() { formVisible.value = true }
-function submitFinalForm() { alert('Заявка отправлена!'); formVisible.value = false; formData.value = { name:'', email:'', message:'' } }
+async function submitFinalForm() {
+  try {
+    const response = await fetch('http://localhost:3000/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData.value)
+    });
+
+    if (response.ok) {
+      alert('✅ Заявка успешно отправлена! Мы свяжемся с вами.');
+      formVisible.value = false;
+      formData.value = { name: '', email: '', message: '' };
+    } else {
+      const err = await response.json();
+      alert('❌ Ошибка: ' + (err.error || 'Не удалось отправить'));
+    }
+  } catch (error) {
+    console.error('Ошибка сети:', error);
+    alert('️ Нет связи с сервером. Убедитесь, что бэкенд запущен на порту 3000.');
+  }
+}
 
 // Карусель
 const popularLaunches = ref([
