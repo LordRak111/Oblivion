@@ -1,40 +1,35 @@
 <template>
-  <div>
-    <SiteHeader />
+  <div id="app">
+    <header class="header">
+      <nav class="nav-menu">
+        <a href="#" @click.prevent="currentTab = 'main'">Главная</a>
+        <a href="#" @click.prevent="currentTab = 'about'">О компании</a>
+        <a href="#">Продукты</a>
+        <a href="#">Проекты</a>
+      </nav>
+    </header>
 
-    <HomePage v-if="currentPage === 'home'" />
-    <ProductPage v-if="currentPage === 'products'" />
-    <ProjectsPage v-if="currentPage === 'projects'" />
+    <main>
+      <section v-if="currentTab === 'main'" class="hero-section">
+        <h1>Покоряем космос вместе</h1>
+        <p>Инновационные решения для запусков и исследований</p>
+        <button class="btn-primary">Узнать больше</button>
+      </section>
 
-    <SiteFooter />
+      <section v-if="currentTab === 'about'" class="about-section">
+        <h2>О компании</h2>
+        <p>Раздел находится в разработке...</p>
+      </section>
+    </main>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-
-import SiteHeader from './components/SiteHeader.vue'
-import SiteFooter from './components/SiteFooter.vue'
-import ProductPage from './components/ProductPage.vue'
-import HomePage from './pages/HomePage.vue'
-import ProjectsPage from './pages/ProjectsPage.vue'
-
-const currentPage = ref('home')
-
-const updatePage = () => {
-  const hash = window.location.hash.replace('#', '')
-
-  if (hash === 'products') {
-    currentPage.value = 'products'
-  } else if (hash === 'projects') {
-    currentPage.value = 'projects'
-  } else {
-    currentPage.value = 'home'
+<script>
+export default {
+  data() {
+    return {
+      currentTab: 'main'
+    }
   }
 }
-
-onMounted(() => {
-  updatePage()
-  window.addEventListener('hashchange', updatePage)
-})
 </script>
