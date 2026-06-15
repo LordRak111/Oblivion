@@ -416,6 +416,7 @@ const formVisible = ref(false)
 const formData = ref({ name:'', email:'', message:'' })
 function quickOrder(item) { formData.value.message = `Интересуюсь: ${item.name}`; formVisible.value = true }
 function openRequestForm() { formVisible.value = true }
+
 function submitFinalForm() {
   if (!formData.value.name || !formData.value.email) {
     showToast('Пожалуйста, заполните имя и email', 'error')
@@ -425,6 +426,43 @@ function submitFinalForm() {
   formVisible.value = false
   formData.value = { name:'', email:'', message:'' }
 }
+
+async function submitFinalForm() {
+  try {
+    const response = await fetch('http://localhost:3000/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData.value)
+    });
+
+    if (response.ok) {
+      alert('✅ Заявка успешно отправлена! Мы свяжемся с вами.');
+      formVisible.value = false;
+      formData.value = { name: '', email: '', message: '' };
+    } else {
+      const err = await response.json();
+      alert('❌ Ошибка: ' + (err.error || 'Не удалось отправить'));
+    }
+  } catch (error) {
+    console.error('Ошибка сети:', error);
+    alert('️ Нет связи с сервером. Убедитесь, что бэкенд запущен на порту 3000.');
+  }
+}
+
+// Карусель
+const popularLaunches = ref([
+  { id:1, mission:'Артемида-2', date:'Сентябрь 2026', status:'успех' },
+  { id:2, mission:'Марс-2026', date:'Июль 2026', status:'планируется' },
+  { id:3, mission:'Спектр-РГ', date:'Май 2026', status:'успех' },
+  { id:4, mission:'Луна-28', date:'Октябрь 2026', status:'планируется' }
+])
+const carouselTrack = ref(null)
+const carouselIndex = ref(0)
+const totalItems = computed(() => popularLaunches.value.length)
+function prevSlide() { if (carouselIndex.value > 0) { carouselIndex.value--; updateCarousel() } }
+function nextSlide() { if (carouselIndex.value < totalItems.value - 1) { carouselIndex.value++; updateCarousel() } }
+function updateCarousel() { if (carouselTrack.value) carouselTrack.value.style.transform = `translateX(-${carouselIndex.value * 100}%)` }
+
 
 // Уведомления
 const toastMsg = ref('')
