@@ -2,15 +2,11 @@
   <div class="universal-cosmos">
     <div class="main-wrap">
       <div class="content-area">
-        <!-- ХЕРО-СЕКЦИЯ -->
+        <!-- Hero секция (без таймера) -->
         <section class="hero-super">
           <div class="hero-text">
             <h1>КОСМИЧЕСКИЙ <span class="glow">КАТАЛОГ</span></h1>
             <p>Ракеты, компоненты и запуски — всё в одном месте</p>
-            <div class="countdown">
-              <div>Ближайший запуск через:</div>
-              <div class="timer">{{ days }}д {{ hours }}ч {{ minutes }}м {{ seconds }}с</div>
-            </div>
           </div>
           <div class="hero-stats">
             <div class="stat" v-for="stat in bigStats" :key="stat.label">
@@ -48,16 +44,18 @@
             </div>
           </div>
           <div class="cart-footer">
-            <button class="btn-primary" @click="checkout">Оформить заказ</button>
+            <button class="checkout-btn" @click="openPaymentModal">Оформить заказ</button>
           </div>
         </div>
 
-        <!-- Сетка товаров -->
+        <!-- Сетка товаров (6 карточек на страницу) -->
         <div class="infinite-grid">
           <div v-for="item in paginatedItems" :key="item.id" class="product-card-super">
             <div class="img-wrap">
               <img :src="item.img" :alt="item.name" loading="lazy">
-              <button class="cart-add" @click="addToCart(item)"><i class="fas fa-cart-plus"></i></button>
+              <button class="cart-add-sticker" @click="addToCart(item)">
+                <i class="fas fa-cart-plus"></i>
+              </button>
             </div>
             <div class="info">
               <h3>{{ item.name }}</h3>
@@ -79,32 +77,27 @@
           <button @click="nextPage" :disabled="currentPage === totalPages">Вперёд</button>
         </div>
 
-        <!-- 3D-ГЛОБУС -->
+        <!-- 3D-глобус -->
         <div class="globe-section">
           <h2><i class="fas fa-globe-americas"></i> Космодромы мира</h2>
           <div ref="globeContainer" class="globe-container"></div>
           <p class="globe-hint">Перетащите мышью для вращения</p>
         </div>
 
-        <!-- КАРУСЕЛЬ ЗАПУСКОВ -->
-        <div class="launch-carousel">
-          <h2><i class="fas fa-rocket"></i> Популярные запуски</h2>
-          <div class="carousel-wrapper">
-            <div class="carousel-track" ref="carouselTrack">
-              <div class="carousel-item" v-for="launch in popularLaunches" :key="launch.id">
-                <h3>{{ launch.mission }}</h3>
-                <p>{{ launch.date }}</p>
-                <div class="launch-status" :class="launch.status">{{ launch.status === 'успех' ? '✅ Успех' : '🚀 Планируется' }}</div>
-              </div>
+        <!-- Отзывы клиентов -->
+        <div class="testimonials-section">
+          <h2><i class="fas fa-quote-left"></i> Отзывы наших клиентов</h2>
+          <div class="testimonials-grid">
+            <div class="testimonial-card" v-for="review in reviews" :key="review.id">
+              <img :src="review.avatar" alt="avatar" class="testimonial-avatar">
+              <p class="testimonial-text">"{{ review.text }}"</p>
+              <h4 class="testimonial-name">{{ review.name }}</h4>
+              <span class="testimonial-title">{{ review.title }}</span>
             </div>
-          </div>
-          <div class="carousel-controls">
-            <button @click="prevSlide">◀</button>
-            <button @click="nextSlide">▶</button>
           </div>
         </div>
 
-        <!-- ПРИЗЫВ -->
+        <!-- Призыв к действию -->
         <div class="final-glory">
           <div class="glory-inner">
             <h2>Готовы запустить свой проект?</h2>
@@ -115,7 +108,7 @@
       </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ -->
+    <!-- Модальное окно деталей товара (без кнопки "Запросить коммерческое предложение") -->
     <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
       <div class="modal-big">
         <div class="modal-header">
@@ -128,12 +121,32 @@
             <div v-for="(val, key) in modalData.specs" :key="key"><strong>{{ key }}:</strong> {{ val }}</div>
           </div>
           <p class="full-desc">{{ modalData.fullDesc }}</p>
-          <button class="btn-primary white-text" @click="quickOrder(modalData)">Запросить коммерческое предложение</button>
+          <!-- Кнопка удалена -->
         </div>
       </div>
     </div>
 
-    <!-- ФОРМА ЗАЯВКИ -->
+    <!-- Модальное окно оплаты -->
+    <div v-if="paymentModalOpen" class="modal-overlay" @click.self="closePaymentModal">
+      <div class="modal-big payment-modal">
+        <div class="modal-header">
+          <h2>Оплата заказа</h2>
+          <button class="close-x" @click="closePaymentModal">×</button>
+        </div>
+        <div class="modal-body">
+          <form novalidate @submit.prevent="processPayment">
+            <input type="text" v-model="payment.cardNumber" placeholder="Номер карты (16 цифр)" maxlength="19" @input="formatCardNumber">
+            <div class="row">
+              <input type="text" v-model="payment.expiry" placeholder="ММ/ГГ" maxlength="5" @input="formatExpiry">
+              <input type="text" v-model="payment.cvv" placeholder="CVV" maxlength="3">
+            </div>
+            <button type="submit" class="btn-primary pay-btn">Оплатить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Форма заявки -->
     <div v-if="formVisible" class="modal-overlay" @click.self="formVisible = false">
       <div class="modal-big">
         <div class="modal-header">
@@ -141,17 +154,17 @@
           <button class="close-x" @click="formVisible = false">×</button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="submitFinalForm">
-            <input type="text" placeholder="Ваше имя" v-model="formData.name" required>
-            <input type="email" placeholder="Email" v-model="formData.email" required>
+          <form novalidate @submit.prevent="submitFinalForm">
+            <input type="text" placeholder="Ваше имя" v-model="formData.name">
+            <input type="email" placeholder="Email" v-model="formData.email">
             <textarea placeholder="Описание проекта" v-model="formData.message"></textarea>
-            <button type="submit" class="btn-submit">Отправить</button>
+            <button type="submit" class="btn-primary form-submit">Отправить</button>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- УВЕДОМЛЕНИЯ -->
+    <!-- Уведомления -->
     <div v-if="toastMsg" class="toast" :class="toastType">{{ toastMsg }}</div>
   </div>
 </template>
@@ -160,42 +173,42 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 
-// ---------------------- КАТАЛОГ ТОВАРОВ ----------------------
+// ===================== КАТАЛОГ ТОВАРОВ (оставлен полным, но отображается по 6) =====================
 const generateItems = () => {
   const rockets = [
-    { name: 'Орбита-X Heavy', height:'62m', payload:'22t', thrust:'2800kN', img:'https://picsum.photos/id/4/300/200', fullDesc:'Сверхтяжёлый носитель для Луны и Марса.', modelType:'rocket' },
-    { name: 'Старт-1', height:'28m', payload:'2.5t', thrust:'450kN', img:'https://picsum.photos/id/29/300/200', fullDesc:'Лёгкий носитель для малых спутников.', modelType:'rocket' },
-    { name: 'Титан-3', height:'74m', payload:'36t', thrust:'4200kN', img:'https://picsum.photos/id/96/300/200', fullDesc:'Флагман для марсианских экспедиций.', modelType:'rocket' },
-    { name: 'Союз-2', height:'46m', payload:'7.5t', thrust:'950kN', img:'https://picsum.photos/id/22/300/200', fullDesc:'Классическая надёжность.', modelType:'rocket' },
-    { name: 'Ангара-А5', height:'55m', payload:'24t', thrust:'2600kN', img:'https://picsum.photos/id/31/300/200', fullDesc:'Тяжёлый носитель нового поколения.', modelType:'rocket' },
-    { name: 'Электрон', height:'17m', payload:'0.3t', thrust:'50kN', img:'https://picsum.photos/id/39/300/200', fullDesc:'Сверхлёгкий для малых спутников.', modelType:'rocket' },
-    { name: 'Нейтрон-2', height:'40m', payload:'13t', thrust:'1450kN', img:'https://picsum.photos/id/44/300/200', fullDesc:'Средний класс с возвращаемой ступенью.', modelType:'rocket' },
-    { name: 'Сатурн-9', height:'98m', payload:'55t', thrust:'5900kN', img:'https://picsum.photos/id/58/300/200', fullDesc:'Ультратяжёлый для пилотируемых экспедиций.', modelType:'rocket' },
-    { name: 'Вега-Лайт', height:'30m', payload:'1.8t', thrust:'300kN', img:'https://picsum.photos/id/15/300/200', fullDesc:'Экономичный запуск малых аппаратов.', modelType:'rocket' },
-    { name: 'Falcon-9R', height:'70m', payload:'22.8t', thrust:'7600kN', img:'https://picsum.photos/id/18/300/200', fullDesc:'Многоразовый носитель среднего класса.', modelType:'rocket' },
+    { name: 'SpaceX Falcon Heavy', height:'70m', payload:'63.8t', thrust:'22800kN', img:'/images/ракета4.PNG', fullDesc:'Сверхтяжёлый носитель для Луны и Марса.', modelType:'rocket' },
+    { name: 'Рокот (Старт-1)', height:'28m', payload:'2.5t', thrust:'450kN', img:'/images/рак7.PNG', fullDesc:'Лёгкий носитель для малых спутников.', modelType:'rocket' },
+    { name: 'Титан-3', height:'74m', payload:'36t', thrust:'4200kN', img:'/images/рак8.PNG', fullDesc:'Флагман для марсианских экспедиций.', modelType:'rocket' },
+    { name: 'Союз-2', height:'46m', payload:'7.5t', thrust:'950kN', img:'/images/ракета3.PNG', fullDesc:'Классическая надёжность.', modelType:'rocket' },
+    { name: 'Ангара-А5', height:'55m', payload:'24t', thrust:'2600kN', img:'/images/рак7.PNG', fullDesc:'Тяжёлый носитель нового поколения.', modelType:'rocket' },
+    { name: 'Электрон', height:'17m', payload:'0.3t', thrust:'50kN', img:'/images/рак6.PNG', fullDesc:'Сверхлёгкий для малых спутников.', modelType:'rocket' },
+    { name: 'Нейтрон (Neutron)', height:'40m', payload:'13t', thrust:'1450kN', img:'/images/ракета 2.PNG', fullDesc:'Средний класс с возвращаемой ступенью.', modelType:'rocket' },
+    { name: 'Сатурн-5', height:'110m', payload:'140t', thrust:'35000kN', img:'/images/рак10.PNG', fullDesc:'Ультратяжёлый для пилотируемых экспедиций.', modelType:'rocket' },
+    { name: 'Вега (Vega)', height:'30m', payload:'1.8t', thrust:'300kN', img:'/images/рак12.PNG', fullDesc:'Экономичный запуск малых аппаратов.', modelType:'rocket' },
+    { name: 'Falcon 9', height:'70m', payload:'22.8t', thrust:'7600kN', img:'/images/рак11.PNG', fullDesc:'Многоразовый носитель среднего класса.', modelType:'rocket' },
     { name: 'CAS Space – Kinetica 2', height:'53 м', payload:'6.5 т', thrust:'1100 кН', img:'/рак6.PNG', fullDesc:'Китайская многоразовая ракета среднего класса.', modelType:'rocket' },
     { name: 'Великий поход-9 (CZ-9)', height:'103 м', payload:'140 т', thrust:'6000+ кН', img:'/рак11.PNG', fullDesc:'Сверхтяжёлая ракета Китая для Луны.', modelType:'rocket' },
     { name: 'SpaceX Starship', height:'120 м', payload:'100 т', thrust:'76000 кН', img:'/ракета1.PNG', fullDesc:'Полностью многоразовая ракета SpaceX.', modelType:'rocket' }
   ]
   const components = [
-    { name: 'ЖРД R-220', mass:'320kg', thrust:'190kN', img:'https://picsum.photos/id/33/300/200', fullDesc:'Кислородно-водородный двигатель.', modelType:'engine' },
+    { name: 'ЖРД RS-25', mass:'320kg', thrust:'190kN', img:'https://picsum.photos/id/33/300/200', fullDesc:'Кислородно-водородный двигатель.', modelType:'engine' },
     { name: 'АСУ "Орион"', mass:'45kg', power:'85W', img:'https://picsum.photos/id/77/300/200', fullDesc:'ИИ для автономной навигации.', modelType:'computer' },
-    { name: 'Солнечные панели X-500', mass:'120kg', power:'12kW', img:'https://picsum.photos/id/106/300/200', fullDesc:'Высокоэффективные фотоэлементы.', modelType:'panel' },
-    { name: 'Гиростабилизатор ГС-6', precision:'0.001°', img:'https://picsum.photos/id/91/300/200', fullDesc:'Точнейшая ориентация.', modelType:'gyro' },
-    { name: 'Теплозащита "Карбон-МК"', temp:'2200°C', img:'https://picsum.photos/id/51/300/200', fullDesc:'Многоразовая абляция.', modelType:'tps' },
-    { name: 'Квантовый датчик звёзд', accuracy:'0.1″', img:'https://picsum.photos/id/62/300/200', fullDesc:'Абсолютная навигация.', modelType:'sensor' },
-    { name: 'Бак композитный К-12', volume:'12m³', img:'https://picsum.photos/id/85/300/200', fullDesc:'Облегчённый криобак.', modelType:'tank' },
-    { name: 'Ракетный ускоритель "Буран-М"', thrust:'1200kN', time:'120с', img:'https://picsum.photos/id/108/300/200', fullDesc:'Твердотопливный ускоритель.', modelType:'booster' }
+    { name: 'Солнечные панели МКС', mass:'120kg', power:'12kW', img:'https://picsum.photos/id/106/300/200', fullDesc:'Высокоэффективные фотоэлементы.', modelType:'panel' },
+    { name: 'Гиростабилизатор', precision:'0.001°', img:'https://picsum.photos/id/91/300/200', fullDesc:'Точнейшая ориентация.', modelType:'gyro' },
+    { name: 'Теплозащита PICA', temp:'2200°C', img:'https://picsum.photos/id/51/300/200', fullDesc:'Многоразовая абляция.', modelType:'tps' },
+    { name: 'Квантовый датчик', accuracy:'0.1″', img:'https://picsum.photos/id/62/300/200', fullDesc:'Абсолютная навигация.', modelType:'sensor' },
+    { name: 'Композитный бак', volume:'12m³', img:'https://picsum.photos/id/85/300/200', fullDesc:'Облегчённый криобак.', modelType:'tank' },
+    { name: 'Твердотопливный ускоритель', thrust:'1200kN', time:'120с', img:'https://picsum.photos/id/108/300/200', fullDesc:'Твердотопливный ускоритель.', modelType:'booster' }
   ]
   const services = [
     { name: 'Вывод на НОО', price:'$25 млн', payload:'до 8т', img:'https://picsum.photos/id/0/300/200', fullDesc:'Низкая опорная орбита.', modelType:'service' },
-    { name: 'Геопереходная орбита (ГПО)', price:'$45 млн', payload:'до 5т', img:'https://picsum.photos/id/1/300/200', fullDesc:'Для спутников связи.', modelType:'service' },
+    { name: 'Геопереходная орбита', price:'$45 млн', payload:'до 5т', img:'https://picsum.photos/id/1/300/200', fullDesc:'Для спутников связи.', modelType:'service' },
     { name: 'Лунная миссия', price:'$120 млн', payload:'до 3т', img:'https://picsum.photos/id/2/300/200', fullDesc:'Доставка модулей на Луну.', modelType:'service' },
-    { name: 'Запуск группировки спутников', price:'договорная', satellites:'до 60', img:'https://picsum.photos/id/3/300/200', fullDesc:'Кластерный запуск.', modelType:'service' },
-    { name: 'Сопровождение полезной нагрузки', price:'$2 млн', img:'https://picsum.photos/id/5/300/200', fullDesc:'Интеграция и тестирование.', modelType:'service' },
+    { name: 'Запуск группировки', price:'договорная', satellites:'до 60', img:'https://picsum.photos/id/3/300/200', fullDesc:'Кластерный запуск.', modelType:'service' },
+    { name: 'Сопровождение ПН', price:'$2 млн', img:'https://picsum.photos/id/5/300/200', fullDesc:'Интеграция и тестирование.', modelType:'service' },
     { name: 'Морской старт', price:'$35 млн', img:'https://picsum.photos/id/6/300/200', fullDesc:'Запуск с океанской платформы.', modelType:'service' },
     { name: 'Межпланетная миссия', price:'$180 млн', target:'Марс, Венера', img:'https://picsum.photos/id/7/300/200', fullDesc:'Полный цикл.', modelType:'service' },
-    { name: 'Страхование космических рисков', price:'от 5%', img:'https://picsum.photos/id/8/300/200', fullDesc:'Финансовая защита.', modelType:'service' }
+    { name: 'Страхование', price:'от 5%', img:'https://picsum.photos/id/8/300/200', fullDesc:'Финансовая защита.', modelType:'service' }
   ]
   let id = 1
   const all = []
@@ -206,12 +219,12 @@ const generateItems = () => {
 }
 const allItems = ref(generateItems())
 
-// Фильтрация, поиск, пагинация
+// Фильтрация, поиск, пагинация (6 товаров на страницу)
 const searchQuery = ref('')
 const activeCat = ref('Все')
 const allCategories = ['Все', 'Ракеты', 'Компоненты', 'Услуги']
 const currentPage = ref(1)
-const itemsPerPage = 12
+const itemsPerPage = 6     // уменьшено в 2 раза
 
 const filteredItems = computed(() => {
   let list = allItems.value
@@ -230,28 +243,48 @@ const paginatedItems = computed(() => {
 function prevPage() { if (currentPage.value > 1) currentPage.value-- }
 function nextPage() { if (currentPage.value < totalPages.value) currentPage.value++ }
 
-// Корзина
+// Корзина и оплата
 const cart = ref([])
 const cartOpen = ref(false)
-function addToCart(item) { if (!cart.value.find(i => i.id === item.id)) cart.value.push({ id: item.id, name: item.name }) }
-function removeFromCart(id) { cart.value = cart.value.filter(i => i.id !== id) }
-function checkout() { alert('Заказ оформлен! С вами свяжется менеджер.') }
+const paymentModalOpen = ref(false)
+const payment = ref({ cardNumber: '', expiry: '', cvv: '' })
 
-// Таймер
-const targetDate = new Date(2026, 5, 15, 12, 0, 0).getTime()
-const days = ref(0), hours = ref(0), minutes = ref(0), seconds = ref(0)
-let timerInterval
-function updateTimer() {
-  const now = Date.now()
-  const diff = targetDate - now
-  if (diff <= 0) { days.value = hours.value = minutes.value = seconds.value = 0; clearInterval(timerInterval); return }
-  days.value = Math.floor(diff / 86400000)
-  hours.value = Math.floor((diff % 86400000) / 3600000)
-  minutes.value = Math.floor((diff % 3600000) / 60000)
-  seconds.value = Math.floor((diff % 60000) / 1000)
+function addToCart(item) {
+  if (!cart.value.find(i => i.id === item.id)) {
+    cart.value.push({ id: item.id, name: item.name })
+    showToast('Товар добавлен в корзину', 'success')
+  } else {
+    showToast('Товар уже в корзине', 'info')
+  }
 }
-onMounted(() => { updateTimer(); timerInterval = setInterval(updateTimer, 1000) })
-onUnmounted(() => { clearInterval(timerInterval) })
+function removeFromCart(id) { cart.value = cart.value.filter(i => i.id !== id) }
+function openPaymentModal() {
+  if (cart.value.length === 0) {
+    showToast('Корзина пуста. Добавьте товары перед оформлением.', 'error')
+    return
+  }
+  paymentModalOpen.value = true
+}
+function closePaymentModal() { paymentModalOpen.value = false; payment.value = { cardNumber: '', expiry: '', cvv: '' } }
+function formatCardNumber(e) {
+  let val = e.target.value.replace(/\D/g, '').substring(0, 16)
+  val = val.replace(/(\d{4})(?=\d)/g, '$1 ')
+  payment.value.cardNumber = val
+}
+function formatExpiry(e) {
+  let val = e.target.value.replace(/\D/g, '').substring(0, 4)
+  if (val.length >= 3) val = val.substring(0,2) + '/' + val.substring(2)
+  payment.value.expiry = val
+}
+function processPayment() {
+  const cardNum = payment.value.cardNumber.replace(/\s/g, '')
+  if (cardNum.length !== 16) { showToast('Введите корректный номер карты (16 цифр)', 'error'); return }
+  if (!payment.value.expiry.match(/^\d{2}\/\d{2}$/)) { showToast('Введите срок в формате ММ/ГГ', 'error'); return }
+  if (payment.value.cvv.length !== 3) { showToast('CVV должен содержать 3 цифры', 'error'); return }
+  showToast('✅ Спасибо за заказ! Ваш заказ успешно оформлен.', 'success')
+  cart.value = []
+  closePaymentModal()
+}
 
 // Статистика
 const bigStats = ref([
@@ -260,7 +293,7 @@ const bigStats = ref([
   { label: 'Успешных миссий', value: 142 }
 ])
 
-// ---------------------- 3D ГЛОБУС ----------------------
+// ===================== 3D-ГЛОБУС =====================
 const globeContainer = ref(null)
 let sceneGlobe, cameraGlobe, rendererGlobe, earthMesh, markersGroup
 function addMarker(lat, lon, color) {
@@ -344,7 +377,32 @@ function initGlobe() {
 }
 onMounted(() => { initGlobe() })
 
-// ---------------------- МОДАЛЬНОЕ ОКНО (без 3D) ----------------------
+// Отзывы
+const reviews = ref([
+  {
+    id: 1,
+    name: 'Илья Маслов',
+    title: 'Главный инженер Роскосмос',
+    text: 'Технологии SpaceTech позволили сократить время подготовки запуска на 40%. Надёжность компонентов впечатляет.',
+    avatar: '/images/businessman-with-a-goatee-beard_480x480.webp'
+  },
+  {
+    id: 2,
+    name: 'Екатерина Ветрова',
+    title: 'Руководитель отдела спутниковой связи',
+    text: 'Отличный каталог, удобная фильтрация и быстрая корзина. 3D-глобус помогает визуализировать космодромы.',
+    avatar: '/images/positivo-feliz-caucasico-maduro-hombre-mediana-edad-sonriendo-sonrisa-dentada-usando-gafas-mostrando-bien-gesto-ambas-manos-aisladas-fondo-blanco_650366-6207.avif'
+  },
+  {
+    id: 3,
+    name: 'Дмитрий Орлов',
+    title: 'Директор по развитию SpaceX Projects',
+    text: 'Мы используем этот сервис для планирования миссий. Реалистичные модели и оперативная поддержка — на высоте.',
+    avatar: '/images/i (12).webp'
+  }
+])
+
+// Модальное окно товара (без кнопки "Запросить коммерческое предложение")
 const modalOpen = ref(false)
 const modalData = ref({})
 function closeModal() { modalOpen.value = false }
@@ -358,6 +416,17 @@ const formVisible = ref(false)
 const formData = ref({ name:'', email:'', message:'' })
 function quickOrder(item) { formData.value.message = `Интересуюсь: ${item.name}`; formVisible.value = true }
 function openRequestForm() { formVisible.value = true }
+
+function submitFinalForm() {
+  if (!formData.value.name || !formData.value.email) {
+    showToast('Пожалуйста, заполните имя и email', 'error')
+    return
+  }
+  showToast('Заявка отправлена! Свяжемся с вами в ближайшее время.', 'success')
+  formVisible.value = false
+  formData.value = { name:'', email:'', message:'' }
+}
+
 async function submitFinalForm() {
   try {
     const response = await fetch('http://localhost:3000/api/contact', {
@@ -394,6 +463,7 @@ function prevSlide() { if (carouselIndex.value > 0) { carouselIndex.value--; upd
 function nextSlide() { if (carouselIndex.value < totalItems.value - 1) { carouselIndex.value++; updateCarousel() } }
 function updateCarousel() { if (carouselTrack.value) carouselTrack.value.style.transform = `translateX(-${carouselIndex.value * 100}%)` }
 
+
 // Уведомления
 const toastMsg = ref('')
 const toastType = ref('success')
@@ -401,22 +471,40 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 </script>
 
 <style scoped>
-/* ---------- БАЗОВЫЕ СТИЛИ ---------- */
+/* ----- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (СОГЛАСНО ВАШЕМУ СТИЛЮ) ----- */
+:root {
+  --bg: #050814;
+  --bg-soft: #091020;
+  --text: #ffffff;
+  --text-soft: #b8c7df;
+  --blue: #4da3ff;
+  --orange: #ff9f43;
+  --orange-dark: #ff7a45;
+  --border: rgba(132, 179, 255, 0.22);
+  --card: rgba(255, 255, 255, 0.045);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 .universal-cosmos {
-  background: #050814;
+  background: var(--bg);
   min-height: 100vh;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Open Sans', 'Montserrat', Arial, sans-serif;
+  color: var(--text);
 }
+
 .main-wrap {
   max-width: 1500px;
   margin: 0 auto;
   padding: 20px;
 }
+
+/* Hero секция (без таймера) */
 .hero-super {
   background: radial-gradient(ellipse at 30% 40%, #102a44, #020816);
   border-radius: 48px;
@@ -427,126 +515,480 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
   flex-wrap: wrap;
   align-items: center;
 }
-.hero-text h1 { font-size: 3rem; margin-bottom: 10px; }
-.glow { background: linear-gradient(135deg,#4cc9ff,#0066ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.countdown .timer { font-size: 2rem; font-weight: bold; background: #00000066; display: inline-block; padding: 6px 20px; border-radius: 60px; margin-top: 12px; }
-.hero-stats { display: flex; gap: 40px; }
-.stat .num { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg,#fff,#7aaaff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-/* Поиск */
-.toolbar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin: 30px 0; }
-.search-area { background: #0d1f32; border-radius: 60px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; flex:2; }
-.search-area input { background: none; border: none; color: white; width: 100%; font-size: 1rem; outline: none; }
-.filter-group { display: flex; gap: 12px; flex-wrap: wrap; }
-.filter-btn { background: transparent; border: 1px solid #2c577d; padding: 6px 20px; border-radius: 40px; color: white; cursor: pointer; }
-.filter-btn.active { background: #0066ff; border-color: #0066ff; }
+.hero-text h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+.glow {
+  background: linear-gradient(135deg, var(--blue), var(--orange));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-stats {
+  display: flex;
+  gap: 40px;
+}
+.stat .num {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff, var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.stat .lab {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+/* Поиск и фильтры */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 30px 0;
+}
+.search-area {
+  background: var(--bg-soft);
+  border-radius: 60px;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 2;
+  border: 1px solid var(--border);
+}
+.search-area input {
+  background: none;
+  border: none;
+  color: var(--text);
+  width: 100%;
+  font-size: 1rem;
+  outline: none;
+}
+.filter-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 6px 20px;
+  border-radius: 40px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+.filter-btn:hover:not(.active) {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
 /* Корзина */
-.cart-panel { background: rgba(10,20,40,0.95); backdrop-filter: blur(12px); border-radius: 32px; padding: 20px; margin-bottom: 30px; border: 1px solid #2c557a; }
-.cart-header { display: flex; justify-content: space-between; border-bottom: 1px solid #335a80; padding-bottom: 12px; }
-.cart-items { max-height: 200px; overflow-y: auto; margin: 15px 0; }
-.cart-item { display: flex; justify-content: space-between; padding: 5px 0; }
-.empty-cart { text-align: center; padding: 20px; color: #8090b0; }
-/* Сетка товаров */
-.infinite-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; }
-.product-card-super { background: rgba(8,20,36,0.7); backdrop-filter: blur(8px); border-radius: 28px; overflow: hidden; transition: 0.2s; border: 1px solid #2d5478; }
-.product-card-super:hover { transform: translateY(-4px); border-color: #4cc9ff; }
-.img-wrap { position: relative; height: 200px; overflow: hidden; }
-.img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-.cart-add { position: absolute; bottom: 10px; right: 10px; background: #0a1f33; border: none; border-radius: 50%; width: 36px; height: 36px; color: white; cursor: pointer; }
-.info { padding: 18px; }
-.specs-mini div { font-size: 0.8rem; display: inline-block; background: #0f1e2f; padding: 2px 8px; border-radius: 30px; margin-right: 6px; margin-bottom: 6px; }
-.action-buttons { display: flex; gap: 12px; margin-top: 16px; }
-.action-buttons button { flex:1; background: transparent; border: 1px solid #3f7fb0; border-radius: 40px; padding: 6px; cursor: pointer; color: white; }
-.action-buttons button.primary { background: linear-gradient(95deg,#0066ff,#00aaff); border: none; }
-.pagination { display: flex; justify-content: center; gap: 20px; margin: 40px 0; }
-.pagination button { background: #1f3f60; border: none; padding: 8px 20px; border-radius: 40px; color: white; cursor: pointer; }
-.pagination button:disabled { opacity: 0.5; cursor: default; }
+.cart-panel {
+  background: var(--bg-soft);
+  backdrop-filter: blur(12px);
+  border-radius: 32px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border);
+}
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.cart-items {
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 15px 0;
+}
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  color: var(--text-soft);
+}
+.empty-cart {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-soft);
+}
+.cart-footer {
+  margin-top: 15px;
+  text-align: center;
+}
+.checkout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 8px 20px;
+  border-radius: 40px;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.checkout-btn:hover {
+  border-color: var(--blue);
+  background: rgba(77, 163, 255, 0.1);
+}
+
+/* Сетка товаров (6 карточек) */
+.infinite-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 32px;
+}
+.product-card-super {
+  background: var(--card);
+  backdrop-filter: blur(8px);
+  border-radius: 32px;
+  overflow: hidden;
+  transition: 0.2s;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.product-card-super:hover {
+  transform: translateY(-4px);
+  border-color: var(--blue);
+}
+.img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #0a1a2a;
+}
+.img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+.product-card-super:hover .img-wrap img {
+  transform: scale(1.02);
+}
+/* Стикер корзины – круглая кнопка в углу */
+.cart-add-sticker {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: var(--orange);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+.cart-add-sticker:hover {
+  background: var(--orange-dark);
+  transform: scale(1.05);
+}
+.info {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.info h3 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.specs-mini div {
+  font-size: 0.9rem;
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  padding: 4px 12px;
+  border-radius: 30px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  color: var(--text-soft);
+}
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+.action-buttons button {
+  flex:1;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.action-buttons button:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.action-buttons button.primary {
+  background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+  border: none;
+  color: white;
+}
+.action-buttons button.primary:hover {
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  transform: translateY(-2px);
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 40px 0;
+}
+.pagination button {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  padding: 8px 20px;
+  border-radius: 40px;
+  color: var(--text);
+  cursor: pointer;
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.pagination button:hover:not(:disabled) {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
 /* Глобус */
-.globe-section { background: #030c18; border-radius: 48px; padding: 30px; margin: 40px 0; text-align: center; }
-.globe-container { width: 100%; height: 400px; background: #021020; border-radius: 28px; cursor: grab; }
-/* Карусель */
-.launch-carousel {
-  background: #0a1428;
+.globe-section {
+  background: var(--bg-soft);
   border-radius: 48px;
   padding: 30px;
   margin: 40px 0;
+  text-align: center;
 }
-.carousel-wrapper {
-  overflow: hidden;
+.globe-container {
   width: 100%;
-}
-.carousel-track {
-  display: flex;
-  transition: transform 0.5s ease;
-  width: 100%;
-}
-.carousel-item {
-  flex: 0 0 100%;
-  background: #0f2139;
+  height: 400px;
+  background: #021020;
   border-radius: 28px;
-  padding: 20px;
-  box-sizing: border-box;
+  cursor: grab;
 }
-.carousel-controls {
+
+/* Отзывы */
+.testimonials-section {
+  background: var(--bg-soft);
+  border-radius: 48px;
+  padding: 40px;
+  margin: 40px 0;
+  text-align: center;
+}
+.testimonials-grid {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
-  margin-top: 25px;
+  gap: 30px;
+  margin-top: 30px;
 }
-.carousel-controls button {
-  background: #1f3f60;
+.testimonial-card {
+  background: var(--card);
+  backdrop-filter: blur(8px);
+  border-radius: 32px;
+  padding: 30px;
+  width: 320px;
+  transition: transform 0.3s;
+  border: 1px solid var(--border);
+}
+.testimonial-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--blue);
+}
+.testimonial-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 3px solid var(--blue);
+}
+.testimonial-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+.testimonial-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.testimonial-title {
+  font-size: 0.85rem;
+  color: var(--blue);
+}
+
+/* Призыв */
+.final-glory {
+  margin: 60px 0 20px;
+}
+.glory-inner {
+  background: linear-gradient(115deg, #10233e, #020b16);
+  border-radius: 64px;
+  padding: 50px 30px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.btn-giant {
+  background: linear-gradient(135deg, var(--orange-dark), var(--orange));
   border: none;
+  padding: 16px 48px;
+  border-radius: 60px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 20px;
+  cursor: pointer;
   color: white;
-  padding: 8px 20px;
-  border-radius: 40px;
+}
+.btn-giant:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 122, 69, 0.4);
+}
+
+/* Модальные окна */
+.modal-overlay {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-big {
+  background: var(--bg-soft);
+  width: 700px;
+  max-width: 90%;
+  border-radius: 32px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.close-x {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--text);
   cursor: pointer;
 }
-.carousel-controls button:hover {
-  background: #0066ff;
+.modal-body {
+  padding: 25px;
 }
-/* Призыв */
-.final-glory { margin: 60px 0 20px; }
-.glory-inner { background: linear-gradient(115deg, #10233e, #020b16); border-radius: 64px; padding: 50px 30px; text-align: center; border: 1px solid #2f7db0; }
-.btn-giant { background: linear-gradient(135deg,#0066ff,#00ccff); border: none; padding: 16px 48px; border-radius: 60px; font-size: 1.2rem; font-weight: bold; margin-top: 20px; cursor: pointer; }
-/* Модальные окна */
-.modal-overlay { position: fixed; top:0;left:0; width:100%;height:100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-.modal-big { background: #0c1a2c; width: 700px; max-width: 90%; border-radius: 32px; max-height: 85vh; overflow-y: auto; }
-.modal-header { display: flex; justify-content: space-between; padding: 20px; border-bottom: 1px solid #2e5d88; }
-.close-x { background: none; border: none; font-size: 2rem; color: white; cursor: pointer; }
-.modal-body { padding: 25px; }
-.modal-img { width: 100%; border-radius: 24px; margin-bottom: 20px; }
-.detail-specs { background: #07131f; padding: 15px; border-radius: 24px; margin: 15px 0; }
-.full-desc { margin: 15px 0; line-height: 1.5; }
-/* Форма заявки */
-form input, form textarea { width: 100%; margin: 8px 0; padding: 12px; background: #0f1f30; border: 1px solid #2a5580; border-radius: 40px; color: white; }
-.btn-submit {
+.modal-img {
   width: 100%;
-  margin-top: 16px;
+  border-radius: 24px;
+  margin-bottom: 20px;
+}
+.detail-specs {
+  background: rgba(0,0,0,0.3);
+  padding: 15px;
+  border-radius: 24px;
+  margin: 15px 0;
+}
+.full-desc {
+  margin: 15px 0;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+/* Форма оплаты */
+.payment-modal .modal-big {
+  max-width: 450px;
+}
+form input, form textarea {
+  width: 100%;
+  margin: 8px 0;
   padding: 12px;
-  background: #0f1f30;
-  border: 1px solid #2a5580;
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 40px;
-  color: #b0c0e0;
+  color: var(--text);
+  outline: none;
+}
+form .row {
+  display: flex;
+  gap: 15px;
+}
+.form-submit, .pay-btn {
+  background: var(--orange) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 40px;
+  padding: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
+  width: 100%;
+  transition: all 0.2s;
 }
-.btn-submit:hover {
-  background: #1a2f48;
+.form-submit:hover, .pay-btn:hover {
+  background: var(--orange-dark) !important;
+  transform: translateY(-2px);
 }
-/* Кнопка в модалке деталей (белый текст) */
-.white-text {
-  background: linear-gradient(95deg,#0066ff,#00aaff) !important;
-  color: white !important;
-  border: none;
+.toast {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  background: #000000cc;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 40px;
+  z-index: 2100;
+  backdrop-filter: blur(8px);
 }
-.toast { position: fixed; bottom: 100px; right: 30px; background: #000000cc; color: white; padding: 12px 24px; border-radius: 40px; z-index: 2100; backdrop-filter: blur(8px); }
+.toast.success { border-left: 4px solid var(--blue); }
+.toast.error { border-left: 4px solid #ff4444; }
+.toast.info { border-left: 4px solid var(--orange); }
+
+/* Адаптивность */
 @media (max-width: 1000px) {
   .hero-super { flex-direction: column; text-align: center; margin-top: 120px; }
   .hero-stats { margin-top: 20px; }
   .toolbar { flex-direction: column; }
+  .testimonials-grid { flex-direction: column; align-items: center; }
+  .infinite-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
 }
 @media (max-width: 768px) {
   .hero-text h1 { font-size: 2rem; }
-  .countdown .timer { font-size: 1.2rem; }
+  .info h3 { font-size: 1.4rem; }
 }
 </style>

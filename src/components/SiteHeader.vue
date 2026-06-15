@@ -18,6 +18,127 @@
         <span></span>
       </button>
 
+
+      <nav
+        class="site-header__nav"
+        :class="{ 'site-header__nav--open': isMenuOpen }"
+      >
+        <div class="site-header__item">
+          <div class="site-header__row">
+            <a href="#top" class="site-header__link" @click="closeMenu">
+              Главная
+            </a>
+
+            <button
+              class="site-header__submenu-button"
+              type="button"
+              aria-label="Открыть разделы главной"
+              @click="toggleDropdown('home')"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+
+          <div
+            class="site-header__dropdown"
+            :class="{ 'site-header__dropdown--open': activeDropdown === 'home' }"
+          >
+            <a href="#mission" @click="closeMenu">Миссия</a>
+            <a href="#stats" @click="closeMenu">Показатели</a>
+            <a href="#directions" @click="closeMenu">Направления</a>
+            <a href="#partners" @click="closeMenu">Партнёры</a>
+          </div>
+        </div>
+
+        <div class="site-header__item">
+          <div class="site-header__row">
+            <a href="#" class="site-header__link" @click.prevent="closeMenu">
+              О компании
+            </a>
+
+            <button
+              class="site-header__submenu-button"
+              type="button"
+              aria-label="Открыть подразделы о компании"
+              @click="toggleDropdown('about')"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+
+          <div
+            class="site-header__dropdown"
+            :class="{ 'site-header__dropdown--open': activeDropdown === 'about' }"
+          >
+            <a href="#" @click.prevent="closeMenu">История</a>
+            <a href="#" @click.prevent="closeMenu">Команда</a>
+            <a href="#" @click.prevent="closeMenu">Сертификаты</a>
+          </div>
+        </div>
+
+        <div class="site-header__item">
+          <div class="site-header__row">
+            <a href="#" class="site-header__link" @click.prevent="closeMenu">
+              Продукты
+            </a>
+
+            <button
+              class="site-header__submenu-button"
+              type="button"
+              aria-label="Открыть подразделы продуктов"
+              @click="toggleDropdown('products')"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+
+          <div
+            class="site-header__dropdown"
+            :class="{ 'site-header__dropdown--open': activeDropdown === 'products' }"
+          >
+            <a href="#" @click.prevent="closeMenu">Ракетные носители</a>
+            <a href="#" @click.prevent="closeMenu">Компоненты</a>
+            <a href="#" @click.prevent="closeMenu">Запуски</a>
+          </div>
+        </div>
+
+        <div class="site-header__item">
+          <div class="site-header__row">
+
+
+            <a href="#projects" class="site-header__link" @click="closeMenu">
+ 
+              Проекты
+            </a>
+
+            <button
+              class="site-header__submenu-button"
+              type="button"
+              aria-label="Открыть подразделы проектов"
+              @click="toggleDropdown('projects')"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+
+          <div
+            class="site-header__dropdown"
+            :class="{ 'site-header__dropdown--open': activeDropdown === 'projects' }"
+          >
+            <a href="#" @click.prevent="closeMenu">Реализованные</a>
+            <a href="#" @click.prevent="closeMenu">Текущие</a>
+            <a href="#" @click.prevent="closeMenu">Будущие</a>
+          </div>
+        </div>
+
       <nav class="site-header__nav" :class="{ active: isMenuOpen }">
         <a
           v-for="item in navItems"
@@ -28,6 +149,7 @@
         >
           {{ item.label }}
         </a>
+
       </nav>
     </div>
   </header>
