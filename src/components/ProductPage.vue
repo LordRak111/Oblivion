@@ -374,10 +374,10 @@ const reviews = ref([
   },
   {
     id: 2,
-    name: 'Екатерина Ветрова',
+    name: 'Денис Евгеньевич',
     title: 'Руководитель отдела спутниковой связи',
     text: 'Отличный каталог, удобная фильтрация и быстрая корзина. 3D-глобус помогает визуализировать космодромы.',
-    avatar: 'public/images/360_F_181067424_KrOLVYmTsAwExuhL7ED52GqNDZFMdk2o.jpg'
+    avatar: 'public/images/i.jpg'
   },
   {
     id: 3,
