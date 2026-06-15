@@ -2,4 +2,3 @@ node_modules/
 .env
 data/*.json
 logs/
-node_modules/
