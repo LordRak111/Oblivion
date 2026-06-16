@@ -1,44 +1,40 @@
 <template>
-  <div>
+  <div id="app">
     <SiteHeader />
-
-    <HomePage v-if="currentPage === 'home'" />
-    <ProductPage v-if="currentPage === 'products'" />
-    <ProjectsPage v-if="currentPage === 'projects'" />
-    <AboutPage v-if="currentPage === 'about'" />
-
+    
+    <component :is="currentPageComponent" />
+    
     <SiteFooter />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import SiteHeader from './components/SiteHeader.vue'
 import SiteFooter from './components/SiteFooter.vue'
-import ProductPage from './components/ProductPage.vue'
 import HomePage from './pages/HomePage.vue'
-import ProjectsPage from './pages/ProjectsPage.vue'
 import AboutPage from './pages/AboutPage.vue'
+// Временно закомментировано, так как файл ProductPage.vue отсутствует локально:
+// import ProductPage from './pages/ProductPage.vue'
+import ProjectsPage from './pages/ProjectsPage.vue'
 
-const currentPage = ref('home')
+const hash = ref(window.location.hash.replace('#', '') || 'home')
 
-const updatePage = () => {
-  const hash = window.location.hash.replace('#', '')
-
-  if (hash === 'products') {
-    currentPage.value = 'products'
-  } else if (hash === 'projects') {
-    currentPage.value = 'projects'
-  } else if (hash === 'about') {
-    currentPage.value = 'about'
-  } else {
-    currentPage.value = 'home'
-  }
+const updateHash = () => {
+  hash.value = window.location.hash.replace('#', '') || 'home'
 }
 
-onMounted(() => {
-  updatePage()
-  window.addEventListener('hashchange', updatePage)
+onMounted(() => window.addEventListener('hashchange', updateHash))
+onUnmounted(() => window.removeEventListener('hashchange', updateHash))
+
+const currentPageComponent = computed(() => {
+  const pages = {
+    home: HomePage,
+    about: AboutPage,
+    // Временно исключено из роутинга, чтобы избежать ошибок сборщика:
+    // products: ProductPage,
+    projects: ProjectsPage
+  }
+  return pages[hash.value] || HomePage
 })
 </script>
