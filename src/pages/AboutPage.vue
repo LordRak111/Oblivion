@@ -1,7 +1,6 @@
 <template>
   <div class="about-page-container">
-    <!-- ГЛАВНЫЙ БАННЕР С ФОНОМ -->
-    <section class="hero-banner">
+    <section class="hero-banner" style="background: linear-gradient(90deg, rgba(5, 8, 18, 0.95), rgba(5, 8, 18, 0.75)), url('/images/bg-stats.jpg') center/cover no-repeat;">
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <span class="badge">О корпорации</span>
@@ -10,7 +9,6 @@
       </div>
     </section>
 
-    <!-- БЛОК СТАТИСТИКИ (ИНТЕРФЕЙСНЫЕ КАРТОЧКИ) -->
     <section class="stats-section">
       <div class="section-grid">
         <div class="stat-card" v-for="item in stats" :key="item.label">
@@ -20,7 +18,6 @@
       </div>
     </section>
 
-    <!-- ИНФОРМАЦИОННЫЙ БЛОК С ИЛЛЮСТРАЦИЕЙ -->
     <section class="info-block-section">
       <div class="info-wrapper">
         <div class="info-text-side">
@@ -30,15 +27,13 @@
         </div>
         <div class="info-image-side">
           <div class="image-frame">
-            <!-- Используем фоновую графику или изображение из активов главной страницы -->
-            <img src="../assets/hero-bg.jpg" alt="Space Technology" class="tech-img" onerror="this.style.display='none'"/>
+            <img src="/images/direction-rocket.jpg" alt="Space Technology" class="tech-img"/>
             <div class="frame-glow"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ТАЙМЛАЙН ХРОНОЛОГИИ (СОЛИДНЫЙ И ТЕМНЫЙ) -->
     <section class="timeline-section">
       <h2 class="section-title">Хронология миссий</h2>
       <div class="timeline-container">
@@ -54,7 +49,6 @@
       </div>
     </section>
 
-    <!-- ДИНАМИЧЕСКИЕ ВАКАНСИИ (ИНТЕГРАЦИЯ С ТВОИМ API) -->
     <section class="api-section">
       <h2 class="section-title">Карьера в Oblivione</h2>
       <p class="section-subtitle">Ищете вызов? Присоединяйтесь к разработке сложнейших космических систем.</p>
@@ -75,7 +69,6 @@
       </div>
     </section>
 
-    <!-- СТИЛЬНАЯ ФОРМА ОБРАТНОЙ СВЯЗИ (ИНТЕГРАЦИЯ С ТВОИМ API) -->
     <section class="feedback-section">
       <div class="feedback-container">
         <div class="feedback-info">
@@ -169,7 +162,6 @@ const submitForm = async () => {
   position: relative;
   height: 60vh;
   min-height: 450px;
-  background: url('../assets/hero-bg.jpg') center/cover no-repeat, radial-gradient(circle at center, #0b1528 0%, #030712 100%);
   display: flex;
   align-items: center;
   justify-content: center;
