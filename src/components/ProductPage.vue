@@ -1,12 +1,15 @@
 <template>
   <div class="universal-cosmos">
+    <!-- Параллакс-фон -->
+    <div class="parallax-bg"></div>
+
     <div class="main-wrap">
       <div class="content-area">
         <!-- Hero секция -->
-        <section class="hero-super">
+        <section class="hero-super" data-aos="fade-up">
           <div class="hero-text">
             <h1>КОСМИЧЕСКИЙ <span class="glow">КАТАЛОГ</span></h1>
-            <p>Ракеты, компоненты — всё в одном месте</p>
+            <p>Ракеты, компоненты, услуги запуска — всё в одном месте</p>
           </div>
           <div class="hero-stats">
             <div class="stat" v-for="stat in bigStats" :key="stat.label">
@@ -17,10 +20,10 @@
         </section>
 
         <!-- Поиск + фильтры -->
-        <div class="toolbar">
+        <div class="toolbar" data-aos="fade-up" data-aos-delay="100">
           <div class="search-area">
             <i class="fas fa-search"></i>
-            <input v-model="searchQuery" placeholder="Поиск ракет, компонентов...">
+            <input v-model="searchQuery" placeholder="Поиск ракет, компонентов, услуг...">
           </div>
           <div class="filter-group">
             <button v-for="cat in allCategories" :key="cat" class="filter-btn" :class="{ active: activeCat === cat }" @click="activeCat = cat">{{ cat }}</button>
@@ -48,9 +51,16 @@
           </div>
         </div>
 
-        <!-- Сетка товаров -->
+        <!-- Сетка товаров с анимацией -->
         <div class="infinite-grid">
-          <div v-for="item in paginatedItems" :key="item.id" class="product-card-super" :class="{ 'component-card': item.category === 'Компоненты' }">
+          <div
+            v-for="(item, index) in paginatedItems"
+            :key="item.id"
+            class="product-card-super"
+            :class="{ 'component-card': item.category === 'Компоненты' }"
+            data-aos="fade-up"
+            :data-aos-delay="index * 80"
+          >
             <div class="img-wrap">
               <img :src="item.img" :alt="item.name" loading="lazy">
               <button class="cart-add-sticker" @click="addToCart(item)">
@@ -71,34 +81,44 @@
         </div>
 
         <!-- Пагинация -->
-        <div class="pagination">
+        <div class="pagination" data-aos="fade-up">
           <button @click="prevPage" :disabled="currentPage === 1">Назад</button>
           <span>Стр. {{ currentPage }} из {{ totalPages }}</span>
           <button @click="nextPage" :disabled="currentPage === totalPages">Вперёд</button>
         </div>
 
         <!-- 3D-глобус -->
-        <div class="globe-section">
-          <h2><i class="fas fa-globe-americas"></i> Космодромы мира</h2>
+        <div class="globe-section" data-aos="fade-up">
+          <h2><i class="fas fa-globe-americas"></i> Наши космодромы </h2>
           <div ref="globeContainer" class="globe-container"></div>
-          <p class="globe-hint">Здесь собраны все космодромы мира</p>
+          <p class="globe-hint">Зажмите чтобы посмотреть</p>
         </div>
 
-        <!-- Отзывы клиентов -->
-        <div class="testimonials-section">
+        <!-- Отзывы -->
+        <div class="testimonials-section" data-aos="fade-up">
           <h2><i class="fas fa-quote-left"></i> Отзывы наших клиентов</h2>
           <div class="testimonials-grid">
-            <div class="testimonial-card" v-for="review in reviews" :key="review.id">
+            <div
+              class="testimonial-card"
+              v-for="review in reviews"
+              :key="review.id"
+              data-aos="fade-up"
+              :data-aos-delay="100 * review.id"
+            >
               <img :src="review.avatar" alt="avatar" class="testimonial-avatar">
               <p class="testimonial-text">"{{ review.text }}"</p>
               <h4 class="testimonial-name">{{ review.name }}</h4>
               <span class="testimonial-title">{{ review.title }}</span>
+              <div class="stars">
+                <span v-for="i in 5" :key="i" class="star" :class="{ filled: i <= review.rating }">★</span>
+              </div>
             </div>
           </div>
+          <button class="btn-add-review" @click="openReviewModal">Оставить отзыв</button>
         </div>
 
-        <!-- Призыв к действию -->
-        <div class="final-glory">
+        <!-- Призыв -->
+        <div class="final-glory" data-aos="fade-up">
           <div class="glory-inner">
             <h2>Готовы запустить свой проект?</h2>
             <p>Станьте частью космической индустрии — оставьте заявку</p>
@@ -108,7 +128,7 @@
       </div>
     </div>
 
-    <!-- Модальное окно деталей товара (без изображения) -->
+    <!-- Модальное окно деталей товара -->
     <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
       <div class="modal-big">
         <div class="modal-header">
@@ -116,7 +136,6 @@
           <button class="close-x" @click="closeModal">×</button>
         </div>
         <div class="modal-body">
-          <!-- Изображение удалено -->
           <div class="detail-specs">
             <div v-for="(val, key) in modalData.specs" :key="key"><strong>{{ key }}:</strong> {{ val }}</div>
           </div>
@@ -140,6 +159,28 @@
               <input type="text" v-model="payment.cvv" placeholder="CVV" maxlength="3">
             </div>
             <button type="submit" class="btn-primary pay-btn">Оплатить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно отзыва -->
+    <div v-if="reviewModalOpen" class="modal-overlay" @click.self="reviewModalOpen = false">
+      <div class="modal-big review-modal">
+        <div class="modal-header">
+          <h2>Оставить отзыв</h2>
+          <button class="close-x" @click="reviewModalOpen = false">×</button>
+        </div>
+        <div class="modal-body">
+          <form novalidate @submit.prevent="submitReview">
+            <input type="text" placeholder="Ваше имя" v-model="reviewForm.name" required>
+            <input type="email" placeholder="Email" v-model="reviewForm.email" required>
+            <textarea placeholder="Ваш отзыв" v-model="reviewForm.text" rows="4" required></textarea>
+            <div class="rating-stars">
+              <span>Оценка:</span>
+              <span v-for="i in 5" :key="i" class="star" :class="{ filled: i <= reviewForm.rating }" @click="reviewForm.rating = i">★</span>
+            </div>
+            <button type="submit" class="btn-primary form-submit">Отправить отзыв</button>
           </form>
         </div>
       </div>
@@ -169,10 +210,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import * as THREE from 'three'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
-// ===================== КАТАЛОГ ТОВАРОВ =====================
+// ===================== КАТАЛОГ ТОВАРОВ (ракеты, компоненты, услуги) =====================
 const generateItems = () => {
   const rockets = [
     { name: 'SpaceX Falcon Heavy', height:'70m', payload:'63.8t', thrust:'22800kN', img:'public/images/ракета1.PNG', fullDesc:'Сверхтяжёлый носитель для Луны и Марса.', modelType:'rocket' },
@@ -196,19 +239,26 @@ const generateItems = () => {
     { name: 'Композитный бак', volume:'12m³', img:'public/images/компонент7.PNG', fullDesc:'Облегчённый криобак.', modelType:'tank' },
     { name: 'Твердотопливный ускоритель', thrust:'1200kN', time:'120с', img:'public/images/компонент8.PNG', fullDesc:'Твердотопливный ускоритель.', modelType:'booster' }
   ]
+  const services = [
+    { name: 'Вывод на НОО', price:'$25 млн', orbit:'НОО, 200–2000 км', mass:'до 8 т', img:'public/images/выводноо.jpg', fullDesc:'Запуск на низкую опорную орбиту.', modelType:'service' },
+    { name: 'Геопереходная орбита (ГПО)', price:'$45 млн', orbit:'ГПО, 35 786 км', mass:'до 5 т', img:'public/images/геопереходнаяорбита.webp', fullDesc:'Вывод на геопереходную орбиту.', modelType:'service' },
+    { name: 'Лунная миссия', price:'$120 млн', orbit:'Лунная траектория', mass:'до 3 т', img:'public/images/лунная миссия.webp', fullDesc:'Доставка на орбиту Луны.', modelType:'service' },
+    { name: 'Запуск группировки', price:'договорная', orbit:'НОО / ССО', mass:'до 12 т', img:'public/images/группировки спутников фото.png', fullDesc:'Кластерный запуск до 60 спутников.', modelType:'service' }
+  ]
 
   let id = 1
   const all = []
   rockets.forEach(r => { all.push({ id: id++, category: 'Ракеты', specs: { Высота: r.height, 'Грузоподъёмность': r.payload, Тяга: r.thrust }, shortDesc: r.name, fullDesc: r.fullDesc, img: r.img, name: r.name, modelType: r.modelType }) })
   components.forEach(c => { all.push({ id: id++, category: 'Компоненты', specs: { Масса: c.mass, Характеристика: c.thrust || c.power || c.precision || c.accuracy || c.volume || c.temp }, shortDesc: c.name, fullDesc: c.fullDesc, img: c.img, name: c.name, modelType: c.modelType }) })
+  services.forEach(s => { all.push({ id: id++, category: 'Услуги', specs: { Цена: s.price, Орбита: s.orbit, Масса: s.mass }, shortDesc: s.name, fullDesc: s.fullDesc, img: s.img, name: s.name, modelType: s.modelType }) })
   return all
 }
 const allItems = ref(generateItems())
 
-// Фильтрация, поиск, пагинация (6 товаров на страницу)
+// Фильтрация, поиск, пагинация
 const searchQuery = ref('')
 const activeCat = ref('Все')
-const allCategories = ['Все', 'Ракеты', 'Компоненты']
+const allCategories = ['Все', 'Ракеты', 'Компоненты', 'Услуги']
 const currentPage = ref(1)
 const itemsPerPage = 6
 
@@ -229,7 +279,7 @@ const paginatedItems = computed(() => {
 function prevPage() { if (currentPage.value > 1) currentPage.value-- }
 function nextPage() { if (currentPage.value < totalPages.value) currentPage.value++ }
 
-// Корзина и оплата (без изменений)
+// Корзина и оплата
 const cart = ref([])
 const cartOpen = ref(false)
 const paymentModalOpen = ref(false)
@@ -279,7 +329,7 @@ const bigStats = ref([
   { label: 'Успешных миссий', value: 142 }
 ])
 
-// ===================== 3D-ГЛОБУС =====================
+// 3D-ГЛОБУС
 const globeContainer = ref(null)
 let sceneGlobe, cameraGlobe, rendererGlobe, earthMesh, markersGroup
 function addMarker(lat, lon, color) {
@@ -361,32 +411,74 @@ function initGlobe() {
   }
   animateGlobe()
 }
-onMounted(() => { initGlobe() })
+onMounted(() => {
+  AOS.init({
+    duration: 800,
+    once: true,
+    easing: 'ease-out'
+  })
+  initGlobe()
+})
 
 // Отзывы
-const reviews = ref([
+const initialReviews = [
   {
     id: 1,
     name: 'Илья Маслов',
     title: 'Главный инженер Роскосмос',
     text: 'Технологии SpaceTech позволили сократить время подготовки запуска на 40%. Надёжность компонентов впечатляет.',
-    avatar: 'public/images/businessman-with-a-goatee-beard_480x480.webp'
+    avatar: 'public/images/businessman-with-a-goatee-beard_480x480.webp',
+    rating: 5
   },
   {
     id: 2,
     name: 'Денис Евгеньевич',
     title: 'Руководитель отдела спутниковой связи',
     text: 'Отличный каталог, удобная фильтрация и быстрая корзина. 3D-глобус помогает визуализировать космодромы.',
-    avatar: 'public/images/i.jpg'
+    avatar: 'public/images/i.jpg',
+    rating: 4
   },
   {
     id: 3,
     name: 'Дмитрий Орлов',
     title: 'Директор по развитию SpaceX Projects',
     text: 'Мы используем этот сервис для планирования миссий. Реалистичные модели и оперативная поддержка — на высоте.',
-    avatar: 'public/images/positivo-feliz-caucasico-maduro-hombre-mediana-edad-sonriendo-sonrisa-dentada-usando-gafas-mostrando-bien-gesto-ambas-manos-aisladas-fondo-blanco_650366-6207.avif'
+    avatar: 'public/images/positivo-feliz-caucasico-maduro-hombre-mediana-edad-sonriendo-sonrisa-dentada-usando-gafas-mostrando-bien-gesto-ambas-manos-aisladas-fondo-blanco_650366-6207.avif',
+    rating: 5
   }
-])
+]
+const reviews = ref([...initialReviews])
+
+const reviewModalOpen = ref(false)
+const reviewForm = ref({
+  name: '',
+  email: '',
+  text: '',
+  rating: 5
+})
+
+function openReviewModal() {
+  reviewForm.value = { name: '', email: '', text: '', rating: 5 }
+  reviewModalOpen.value = true
+}
+
+function submitReview() {
+  if (!reviewForm.value.name || !reviewForm.value.email || !reviewForm.value.text) {
+    showToast('Заполните все поля', 'error')
+    return
+  }
+  const newReview = {
+    id: Date.now(),
+    name: reviewForm.value.name,
+    title: 'Клиент',
+    text: reviewForm.value.text,
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewForm.value.name)}&background=4da3ff&color=fff&size=80`,
+    rating: reviewForm.value.rating
+  }
+  reviews.value.unshift(newReview)
+  reviewModalOpen.value = false
+  showToast('Спасибо за отзыв!', 'success')
+}
 
 // Модальное окно товара
 const modalOpen = ref(false)
@@ -419,7 +511,9 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 </script>
 
 <style scoped>
-/* ----- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----- */
+/* Подключение шрифтов */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Open+Sans:wght@400;600;700&display=swap');
+
 :root {
   --bg: #050814;
   --bg-soft: #091020;
@@ -442,17 +536,51 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .universal-cosmos {
   background: var(--bg);
   min-height: 100vh;
-  font-family: 'Open Sans', 'Montserrat', Arial, sans-serif;
+  font-family: 'Open Sans', sans-serif;
   color: var(--text);
+  overflow-x: hidden;
 }
 
-.main-wrap {
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 20px;
+/* Параллакс-фон */
+.parallax-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120vh;
+  background: radial-gradient(ellipse at 30% 40%, rgba(0, 80, 180, 0.15), transparent 70%),
+              radial-gradient(ellipse at 70% 60%, rgba(255, 120, 30, 0.08), transparent 60%),
+              var(--bg);
+  transform: translateZ(-1px) scale(1.1);
+  z-index: -1;
+  pointer-events: none;
 }
 
-/* Hero секция */
+/* Заголовки – Montserrat */
+h1, h2, h3, h4, .glow, .stat .num, .btn-giant, .btn-add-review, .checkout-btn {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+/* Текст – Open Sans (по умолчанию) */
+body, p, .lab, .specs-mini, .testimonial-text, .full-desc, input, textarea, button {
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Анимации AOS (для красоты) */
+[data-aos] {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+[data-aos].aos-animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-aos="fade-up"] {
+  transform: translateY(40px);
+}
+
+/* Hero */
 .hero-super {
   background: radial-gradient(ellipse at 30% 40%, rgba(132, 179, 255, 0.22), #020816);
   border-radius: 48px;
@@ -462,10 +590,14 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 .hero-text h1 {
   font-size: 3rem;
   margin-bottom: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
 }
 .glow {
   background: linear-gradient(135deg, var(--blue), var(--orange));
@@ -628,7 +760,6 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .product-card-super:hover .img-wrap img {
   transform: scale(1.02);
 }
-/* Уменьшаем изображения компонентов в 1.5 раза */
 .component-card .img-wrap img {
   transform: scale(0.66);
 }
@@ -668,6 +799,8 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
   font-size: 1.6rem;
   margin-bottom: 12px;
   color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
 }
 .specs-mini div {
   font-size: 0.9rem;
@@ -700,9 +833,8 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
   border-color: var(--blue);
   color: var(--blue);
 }
-/* Кнопка "Заказать" – как большая кнопка "Связаться с нами" */
 .action-buttons button.primary {
-  background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+  background: linear-gradient(135deg, var(--blue), var(--orange));
   border: none;
   color: white;
   font-weight: 700;
@@ -710,8 +842,8 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 }
 .action-buttons button.primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(255, 122, 69, 0.45);
-  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  box-shadow: 0 12px 28px rgba(77, 163, 255, 0.45);
+  background: linear-gradient(135deg, var(--orange), var(--blue));
   border: none;
 }
 
@@ -803,10 +935,61 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
   font-weight: bold;
   color: var(--text);
   margin-bottom: 5px;
+  font-family: 'Montserrat', sans-serif;
 }
 .testimonial-title {
   font-size: 0.85rem;
   color: var(--blue);
+}
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 10px;
+}
+.star {
+  font-size: 1.4rem;
+  color: #555;
+  cursor: default;
+}
+.star.filled {
+  color: #ffc107;
+}
+.btn-add-review {
+  margin-top: 30px;
+  padding: 12px 32px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-add-review:hover {
+  background: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 159, 67, 0.3);
+}
+
+/* Модальное окно отзыва */
+.review-modal .modal-big {
+  max-width: 500px;
+}
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+.rating-stars .star {
+  font-size: 2rem;
+  color: #555;
+  cursor: pointer;
+}
+.rating-stars .star.filled {
+  color: #ffc107;
 }
 
 /* Призыв */
@@ -821,7 +1004,7 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
   border: 1px solid var(--border);
 }
 .btn-giant {
-  background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+  background: linear-gradient(135deg, var(--blue), var(--orange));
   border: none;
   padding: 16px 48px;
   border-radius: 60px;
@@ -834,8 +1017,8 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 }
 .btn-giant:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(255, 122, 69, 0.45);
-  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  box-shadow: 0 12px 28px rgba(77, 163, 255, 0.45);
+  background: linear-gradient(135deg, var(--orange), var(--blue));
 }
 
 /* Модальные окна */
@@ -880,7 +1063,6 @@ function showToast(msg, type='success') { toastMsg.value = msg; toastType.value 
 .modal-body {
   padding: 25px;
 }
-/* .modal-img полностью удалён */
 .detail-specs {
   background: rgba(0,0,0,0.3);
   padding: 15px;
