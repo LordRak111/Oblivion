@@ -3,7 +3,7 @@
     <div class="site-footer__container">
       <div class="site-footer__main">
         <div class="site-footer__brand">
-          <a href="#top" class="site-footer__logo">
+          <router-link to="/" class="site-footer__logo">
             <img
               class="site-footer__logo-image"
               src="/images/logo.png"
@@ -13,7 +13,7 @@
             <span class="site-footer__logo-text">
               Oblivione Space
             </span>
-          </a>
+          </router-link>
 
           <p>
             Частная компания в сфере ракетостроения, спутниковых решений
@@ -24,19 +24,19 @@
         <div class="site-footer__column">
           <h3>Навигация</h3>
 
-          <a href="#top">Главная</a>
-          <a href="#mission">Миссия</a>
-          <a href="#stats">Показатели</a>
-          <a href="#directions">Направления</a>
+          <router-link to="/">Главная</router-link>
+          <router-link to="/about">О компании</router-link>
+          <router-link to="/products">Продукты</router-link>
+          <router-link to="/projects">Проекты</router-link>
         </div>
 
         <div class="site-footer__column">
           <h3>Разделы</h3>
 
-          <a href="#partners">Партнёры</a>
-          <a href="#">О компании</a>
-          <a href="#">Проекты</a>
-          <a href="#">Контакты</a>
+          <router-link to="/technologies">Технологии</router-link>
+          <router-link to="/career">Карьера</router-link>
+          <router-link to="/news">Новости</router-link>
+          <router-link to="/contacts">Контакты</router-link>
         </div>
 
         <div class="site-footer__column">

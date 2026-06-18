@@ -1,0 +1,166 @@
+html {
+  overflow-x: hidden;
+}
+
+body,
+#app {
+  width: 100%;
+  max-width: 100%;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select,
+button {
+  max-width: 100%;
+}
+
+/* Старый встроенный чат каталога заменён общим чатом приложения. */
+.universal-cosmos .chat-support {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .home-container,
+  .section-grid,
+  .info-wrapper,
+  .feedback-container {
+    width: min(100% - 32px, 920px);
+  }
+
+  .about-page-container,
+  .universal-cosmos,
+  .projects-page {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-page-padding: 16px;
+  }
+
+  .hero,
+  .hero-banner,
+  .tech-hero,
+  .career-hero,
+  .news-hero,
+  .contacts-hero {
+    min-height: 64svh;
+  }
+
+  .hero__content,
+  .hero-content {
+    width: calc(100% - 28px);
+  }
+
+  .hero__title,
+  .hero-content h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .stats-grid,
+  .section-grid,
+  .directions-grid,
+  .audience-grid,
+  .projects-grid,
+  .tech-grid,
+  .benefits-grid,
+  .news-grid,
+  .contacts-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .info-wrapper,
+  .feedback-container,
+  .mission-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .projects-page,
+  .technologies-page,
+  .career-page,
+  .news-page,
+  .contacts-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .project-card__body,
+  .tech-card,
+  .vacancy-card,
+  .news-content,
+  .contact-info,
+  .contact-form-wrapper {
+    padding-left: var(--mobile-page-padding) !important;
+    padding-right: var(--mobile-page-padding) !important;
+  }
+
+  .projects-tabs {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: thin;
+  }
+
+  .projects-tab {
+    flex: 0 0 auto;
+  }
+
+  .toolbar,
+  .filter-group,
+  .search-area {
+    width: 100%;
+  }
+
+  .toolbar {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+  }
+
+  .home-container,
+  .section-grid,
+  .info-wrapper,
+  .feedback-container {
+    width: calc(100% - 24px);
+  }
+
+  .hero__title {
+    font-size: clamp(38px, 12vw, 56px);
+  }
+
+  .section-title,
+  .projects-head h1,
+  .tech-hero h1,
+  .career-hero h1,
+  .news-hero h1,
+  .contacts-hero h1 {
+    font-size: clamp(30px, 10vw, 44px) !important;
+  }
+
+  .site-footer__container {
+    width: calc(100% - 24px);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  input,
+  select {
+    min-height: 44px;
+  }
+}
